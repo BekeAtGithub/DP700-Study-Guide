@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor & Optimize Analytics Solution - DP-700 Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Monitor and Optimize an Analytics Solution</h1>
+            <p class="subtitle">30-35% of Exam Weight</p>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="implement-manage.html">Implement & Manage</a></li>
+                <li><a href="ingest-transform.html">Ingest & Transform</a></li>
+                <li><a href="monitor-optimize.html" class="active">Monitor & Optimize</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="quick-reference.html">Quick Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="monitoring" class="content-section">
+            <h2>Monitor Fabric Items</h2>
+
+            <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                <strong>🏥 Hospital Monitoring Analogy:</strong> Think of <strong>monitoring</strong> like a hospital's patient monitoring system. The <strong>Monitoring Hub</strong> is like the central nurses' station where all patient vitals are displayed. <strong>Alerts</strong> are like alarms that go off when vital signs are abnormal. <strong>Metrics</strong> (heart rate, blood pressure) are like performance indicators (throughput, latency). <strong>Logs</strong> are like patient charts that record everything that happened. Just as nurses check vitals regularly and respond to alarms, data engineers monitor dashboards and respond to alerts to keep the data pipeline healthy.
+            </div>
+
+            <div class="subsection">
+                <h3>Monitor Data Ingestion</h3>
+                <p>Track data ingestion processes to ensure data is loaded correctly and on time.</p>
+                
+                <h4>Key Metrics to Monitor:</h4>
+                <ul>
+                    <li><strong>Ingestion Rate:</strong> Records/bytes per second</li>
+                    <li><strong>Latency:</strong> Time from source to destination</li>
+                    <li><strong>Success Rate:</strong> Percentage of successful ingestions</li>
+                    <li><strong>Data Volume:</strong> Amount of data ingested</li>
+                    <li><strong>Error Count:</strong> Number of failed ingestions</li>
+                </ul>
+
+                <h4>Monitoring Tools:</h4>
+                <table>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Purpose</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td>Monitoring Hub</td>
+                        <td>Central monitoring dashboard</td>
+                        <td>View all activities, filter by status, drill into details</td>
+                    </tr>
+                    <tr>
+                        <td>Pipeline Runs</td>
+                        <td>Track pipeline executions</td>
+                        <td>Run history, duration, status, activity details</td>
+                    </tr>
+                    <tr>
+                        <td>Dataflow Refresh History</td>
+                        <td>Monitor dataflow refreshes</td>
+                        <td>Refresh status, duration, row counts</td>
+                    </tr>
+                    <tr>
+                        <td>Azure Monitor</td>
+                        <td>Advanced monitoring and alerting</td>
+                        <td>Logs, metrics, dashboards, alerts</td>
+                    </tr>
+                </table>
+
+                <div class="key-points">
+                    <h4>Best Practices:</h4>
+                    <ul>
+                        <li>Set up alerts for failed ingestions</li>
+                        <li>Monitor ingestion lag for streaming data</li>
+                        <li>Track data quality metrics</li>
+                        <li>Review ingestion patterns for anomalies</li>
+                        <li>Maintain audit logs for compliance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Monitor Data Transformation</h3>
+                <p>Ensure data transformations execute successfully and efficiently.</p>
+                
+                <h4>Transformation Monitoring:</h4>
+                <ul>
+                    <li><strong>Notebook Execution:</strong>
+                        <ul>
+                            <li>Cell execution time</li>
+                            <li>Spark job stages and tasks</li>
+                            <li>Memory and CPU usage</li>
+                            <li>Data shuffle metrics</li>
+                        </ul>
+                    </li>
+                    <li><strong>Dataflow Refresh:</strong>
+                        <ul>
+                            <li>Refresh duration</li>
+                            <li>Rows processed</li>
+                            <li>Query folding efficiency</li>
+                            <li>Error messages</li>
+                        </ul>
+                    </li>
+                    <li><strong>SQL Queries:</strong>
+                        <ul>
+                            <li>Query execution time</li>
+                            <li>Rows scanned vs. returned</li>
+                            <li>Resource consumption</li>
+                            <li>Query plans</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="note">
+                    <strong>Spark Monitoring:</strong> Use the Spark UI to analyze job execution, identify bottlenecks, and optimize performance.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Monitor Semantic Model Refresh</h3>
+                <p>Track semantic model (dataset) refreshes to ensure reports have current data.</p>
+                
+                <h4>Refresh Monitoring:</h4>
+                <ul>
+                    <li><strong>Refresh History:</strong> View past refresh attempts</li>
+                    <li><strong>Refresh Status:</strong> Success, failure, or in progress</li>
+                    <li><strong>Refresh Duration:</strong> Time taken for each refresh</li>
+                    <li><strong>Refresh Type:</strong> Full or incremental</li>
+                    <li><strong>Error Details:</strong> Failure reasons and messages</li>
+                </ul>
+
+                <h4>Common Refresh Issues:</h4>
+                <table>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Cause</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>Refresh takes too long</td>
+                        <td>Optimize queries, use incremental refresh</td>
+                    </tr>
+                    <tr>
+                        <td>Connection Error</td>
+                        <td>Cannot connect to data source</td>
+                        <td>Check credentials, network, firewall</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Error</td>
+                        <td>Dataset too large for capacity</td>
+                        <td>Reduce data volume, upgrade capacity</td>
+                    </tr>
+                    <tr>
+                        <td>Permission Error</td>
+                        <td>Insufficient access rights</td>
+                        <td>Grant proper permissions to service principal</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="subsection">
+                <h3>Configure Alerts</h3>
+                <p>Set up proactive notifications for important events and issues.</p>
+                
+                <h4>Alert Types:</h4>
+                <ul>
+                    <li><strong>Data Alerts:</strong> Trigger when data meets conditions</li>
+                    <li><strong>Refresh Alerts:</strong> Notify on refresh failures</li>
+                    <li><strong>Performance Alerts:</strong> Alert on slow queries or high resource usage</li>
+                    <li><strong>Capacity Alerts:</strong> Warn when approaching limits</li>
+                </ul>
+
+                <h4>Alert Configuration:</h4>
+                <ol>
+                    <li>Define alert condition (threshold, pattern, anomaly)</li>
+                    <li>Set alert severity (info, warning, critical)</li>
+                    <li>Configure notification channels (email, Teams, webhook)</li>
+                    <li>Specify recipients or groups</li>
+                    <li>Set alert frequency and suppression rules</li>
+                </ol>
+
+                <div class="key-points">
+                    <h4>Alert Best Practices:</h4>
+                    <ul>
+                        <li>Avoid alert fatigue - set meaningful thresholds</li>
+                        <li>Use different severity levels appropriately</li>
+                        <li>Include actionable information in alerts</li>
+                        <li>Test alerts before deploying to production</li>
+                        <li>Review and adjust alert rules regularly</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="errors" class="content-section">
+            <h2>Identify and Resolve Errors</h2>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Pipeline Errors</h3>
+
+                <h4>Common Pipeline Errors:</h4>
+                <table>
+                    <tr>
+                        <th>Error Type</th>
+                        <th>Symptoms</th>
+                        <th>Resolution</th>
+                    </tr>
+                    <tr>
+                        <td>Connection Failure</td>
+                        <td>Cannot connect to source/destination</td>
+                        <td>Verify credentials, network connectivity, firewall rules</td>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>Activity exceeds timeout limit</td>
+                        <td>Increase timeout, optimize query, partition data</td>
+                    </tr>
+                    <tr>
+                        <td>Schema Mismatch</td>
+                        <td>Source and destination schemas don't match</td>
+                        <td>Update mapping, enable schema drift, fix source</td>
+                    </tr>
+                    <tr>
+                        <td>Permission Denied</td>
+                        <td>Insufficient access rights</td>
+                        <td>Grant proper permissions, update service principal</td>
+                    </tr>
+                    <tr>
+                        <td>Data Type Error</td>
+                        <td>Type conversion failure</td>
+                        <td>Add data type conversion, handle nulls</td>
+                    </tr>
+                </table>
+
+                <h4>Debugging Techniques:</h4>
+                <ul>
+                    <li><strong>Activity Output:</strong> Review output JSON for error details</li>
+                    <li><strong>Debug Mode:</strong> Run pipeline in debug mode with breakpoints</li>
+                    <li><strong>Logging:</strong> Enable detailed logging for activities</li>
+                    <li><strong>Data Preview:</strong> Check data at each stage</li>
+                    <li><strong>Retry Policy:</strong> Configure retry for transient failures</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Know how to use pipeline monitoring, debug mode, and activity outputs to troubleshoot issues.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Dataflow Errors</h3>
+
+                <h4>Common Dataflow Errors:</h4>
+                <ul>
+                    <li><strong>Query Timeout:</strong> Query takes too long to execute</li>
+                    <li><strong>Memory Limit:</strong> Transformation exceeds memory capacity</li>
+                    <li><strong>Data Source Error:</strong> Cannot read from source</li>
+                    <li><strong>Transformation Error:</strong> Invalid M code or logic</li>
+                    <li><strong>Destination Error:</strong> Cannot write to destination</li>
+                </ul>
+
+                <h4>Resolution Strategies:</h4>
+                <ul>
+                    <li><strong>Enable Query Folding:</strong> Push operations to source database</li>
+                    <li><strong>Reduce Data Volume:</strong> Filter early in the query</li>
+                    <li><strong>Optimize Transformations:</strong> Simplify complex operations</li>
+                    <li><strong>Use Staging:</strong> Break into multiple dataflows</li>
+                    <li><strong>Incremental Refresh:</strong> Process only changed data</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Query Folding:</strong> When enabled, Power Query pushes transformations to the source database, improving performance significantly.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Notebook Errors</h3>
+
+                <h4>Common Notebook Errors:</h4>
+                <table>
+                    <tr>
+                        <th>Error</th>
+                        <th>Cause</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>OutOfMemoryError</td>
+                        <td>Insufficient executor memory</td>
+                        <td>Increase executor memory, partition data, cache strategically</td>
+                    </tr>
+                    <tr>
+                        <td>FileNotFoundException</td>
+                        <td>Path doesn't exist</td>
+                        <td>Verify path, check permissions, ensure file exists</td>
+                    </tr>
+                    <tr>
+                        <td>AnalysisException</td>
+                        <td>Invalid SQL or schema issue</td>
+                        <td>Check SQL syntax, verify column names, validate schema</td>
+                    </tr>
+                    <tr>
+                        <td>Py4JJavaError</td>
+                        <td>Java exception in Spark</td>
+                        <td>Check Spark logs, verify data types, review transformations</td>
+                    </tr>
+                    <tr>
+                        <td>Task Failure</td>
+                        <td>Executor task failed</td>
+                        <td>Check for data skew, increase resources, handle nulls</td>
+                    </tr>
+                </table>
+
+                <h4>Debugging Notebooks:</h4>
+                <ul>
+                    <li><strong>Print Statements:</strong> Add debug output</li>
+                    <li><strong>Display Data:</strong> Use display() to inspect DataFrames</li>
+                    <li><strong>Spark UI:</strong> Analyze job execution and stages</li>
+                    <li><strong>Exception Handling:</strong> Use try-except blocks</li>
+                    <li><strong>Logging:</strong> Implement structured logging</li>
+                </ul>
+
+                <pre><code># Example: Error handling in notebooks
+try:
+    df = spark.read.format("delta").load("Tables/data")
+    result = df.filter(col("status") == "Active").count()
+    print(f"Active records: {result}")
+except Exception as e:
+    print(f"Error occurred: {str(e)}")
+    # Log error details
+    import traceback
+    traceback.print_exc()</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Eventhouse Errors</h3>
+
+                <h4>Common Eventhouse/KQL Database Errors:</h4>
+                <ul>
+                    <li><strong>Ingestion Failures:</strong> Data not ingested properly</li>
+                    <li><strong>Query Timeout:</strong> Query exceeds time limit</li>
+                    <li><strong>Throttling:</strong> Too many concurrent requests</li>
+                    <li><strong>Schema Mismatch:</strong> Incoming data doesn't match table schema</li>
+                    <li><strong>Retention Policy:</strong> Data deleted by retention policy</li>
+                </ul>
+
+                <h4>Resolution Approaches:</h4>
+                <ul>
+                    <li>Check ingestion status and error messages</li>
+                    <li>Optimize KQL queries (use summarize, limit results)</li>
+                    <li>Implement batching for ingestion</li>
+                    <li>Update table schema or use dynamic columns</li>
+                    <li>Review and adjust retention policies</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Eventstream Errors</h3>
+
+                <h4>Common Eventstream Errors:</h4>
+                <ul>
+                    <li><strong>Source Connection:</strong> Cannot connect to event source</li>
+                    <li><strong>Transformation Failure:</strong> Invalid transformation logic</li>
+                    <li><strong>Destination Error:</strong> Cannot write to destination</li>
+                    <li><strong>Throughput Limit:</strong> Exceeding capacity limits</li>
+                    <li><strong>Data Format:</strong> Unexpected data format</li>
+                </ul>
+
+                <h4>Troubleshooting Steps:</h4>
+                <ol>
+                    <li>Check eventstream status in monitoring hub</li>
+                    <li>Review error messages in activity log</li>
+                    <li>Verify source and destination connections</li>
+                    <li>Test transformations with sample data</li>
+                    <li>Monitor throughput and adjust partitions</li>
+                </ol>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve T-SQL Errors</h3>
+
+                <h4>Common T-SQL Errors:</h4>
+                <table>
+                    <tr>
+                        <th>Error</th>
+                        <th>Description</th>
+                        <th>Fix</th>
+                    </tr>
+                    <tr>
+                        <td>Syntax Error</td>
+                        <td>Invalid SQL syntax</td>
+                        <td>Review SQL, check keywords, verify punctuation</td>
+                    </tr>
+                    <tr>
+                        <td>Object Not Found</td>
+                        <td>Table/view doesn't exist</td>
+                        <td>Verify object name, check schema, ensure object exists</td>
+                    </tr>
+                    <tr>
+                        <td>Permission Denied</td>
+                        <td>Insufficient privileges</td>
+                        <td>Grant SELECT/INSERT/UPDATE/DELETE permissions</td>
+                    </tr>
+                    <tr>
+                        <td>Data Type Mismatch</td>
+                        <td>Incompatible data types</td>
+                        <td>Cast/convert to correct type</td>
+                    </tr>
+                    <tr>
+                        <td>Constraint Violation</td>
+                        <td>Primary key, foreign key, or check constraint</td>
+                        <td>Fix data to meet constraints</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Query Optimization:</strong> Use EXPLAIN to view query execution plans and identify performance bottlenecks.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Identify and Resolve Shortcut Errors</h3>
+
+                <h4>Common Shortcut Issues:</h4>
+                <ul>
+                    <li><strong>Access Denied:</strong> Insufficient permissions on source</li>
+                    <li><strong>Path Not Found:</strong> Source path doesn't exist</li>
+                    <li><strong>Connection Error:</strong> Cannot reach external source</li>
+                    <li><strong>Credential Expiration:</strong> Authentication credentials expired</li>
+                    <li><strong>Format Incompatibility:</strong> Unsupported file format</li>
+                </ul>
+
+                <h4>Resolution Steps:</h4>
+                <ul>
+                    <li>Verify source path and permissions</li>
+                    <li>Update or refresh credentials</li>
+                    <li>Check network connectivity and firewall</li>
+                    <li>Ensure source data is in supported format</li>
+                    <li>Test shortcut with small dataset first</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="performance" class="content-section">
+            <h2>Optimize Performance</h2>
+
+            <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                <strong>📚 Library Organization Analogy:</strong> Think of <strong>optimization</strong> like organizing a massive library. <strong>Partitioning</strong> is like organizing books by genre into different sections - you don't search the entire library for a cookbook. <strong>Z-Order</strong> is like arranging books within each section by author and publication date - related books are physically close together. <strong>V-Order</strong> is like using a special shelving system optimized for how people actually browse. <strong>Compaction</strong> is like consolidating scattered books into fewer, fuller shelves. <strong>Caching</strong> is like keeping popular books at the front desk for quick access. All these make finding books (querying data) much faster!
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize a Lakehouse Table</h3>
+
+                <h4>Optimization Techniques:</h4>
+                <ul>
+                    <li><strong>V-Order:</strong> Optimize Delta tables for faster reads
+                        <pre><code>-- Enable V-Order on write
+df.write.format("delta") \
+    .option("delta.enableVOrder", "true") \
+    .save("Tables/optimized_table")</code></pre>
+                    </li>
+                    <li><strong>Z-Ordering:</strong> Co-locate related data
+                        <pre><code>-- Optimize with Z-Order
+OPTIMIZE table_name
+ZORDER BY (column1, column2)</code></pre>
+                    </li>
+                    <li><strong>Partitioning:</strong> Divide data into partitions
+                        <pre><code># Partition by date
+df.write.format("delta") \
+    .partitionBy("year", "month") \
+    .save("Tables/partitioned_table")</code></pre>
+                    </li>
+                    <li><strong>Compaction:</strong> Merge small files
+                        <pre><code>-- Compact small files
+OPTIMIZE table_name</code></pre>
+                    </li>
+                    <li><strong>Vacuum:</strong> Remove old file versions
+                        <pre><code>-- Clean up old files (older than 7 days)
+VACUUM table_name RETAIN 168 HOURS</code></pre>
+                    </li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand when to use V-Order, Z-Order, partitioning, and compaction for different scenarios.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize a Pipeline</h3>
+
+                <h4>Pipeline Optimization Strategies:</h4>
+                <ul>
+                    <li><strong>Parallel Execution:</strong>
+                        <ul>
+                            <li>Use ForEach with parallel execution</li>
+                            <li>Set degree of parallelism appropriately</li>
+                            <li>Avoid dependencies where possible</li>
+                        </ul>
+                    </li>
+                    <li><strong>Copy Activity Optimization:</strong>
+                        <ul>
+                            <li>Enable parallel copy with partitioning</li>
+                            <li>Use appropriate DIU (Data Integration Units)</li>
+                            <li>Enable staging for large datasets</li>
+                            <li>Use binary copy when possible</li>
+                        </ul>
+                    </li>
+                    <li><strong>Reduce Data Movement:</strong>
+                        <ul>
+                            <li>Filter data at source</li>
+                            <li>Use query instead of full table</li>
+                            <li>Compress data during transfer</li>
+                        </ul>
+                    </li>
+                    <li><strong>Incremental Loading:</strong>
+                        <ul>
+                            <li>Use watermark for incremental loads</li>
+                            <li>Process only changed data</li>
+                            <li>Implement change data capture</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Performance Best Practices:</h4>
+                    <ul>
+                        <li>Minimize data movement between activities</li>
+                        <li>Use appropriate timeout values</li>
+                        <li>Implement retry policies for transient failures</li>
+                        <li>Monitor and tune based on metrics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize a Data Warehouse</h3>
+
+                <h4>Warehouse Optimization Techniques:</h4>
+                <table>
+                    <tr>
+                        <th>Technique</th>
+                        <th>Purpose</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td>Materialized Views</td>
+                        <td>Pre-compute aggregations</td>
+                        <td>CREATE MATERIALIZED VIEW AS SELECT...</td>
+                    </tr>
+                    <tr>
+                        <td>Result Set Caching</td>
+                        <td>Cache query results</td>
+                        <td>Automatic in Fabric Warehouse</td>
+                    </tr>
+                    <tr>
+                        <td>Statistics</td>
+                        <td>Help query optimizer</td>
+                        <td>CREATE STATISTICS or AUTO_CREATE_STATISTICS</td>
+                    </tr>
+                    <tr>
+                        <td>Partitioning</td>
+                        <td>Divide large tables</td>
+                        <td>Partition by date/range</td>
+                    </tr>
+                    <tr>
+                        <td>Indexing</td>
+                        <td>Speed up queries</td>
+                        <td>Clustered columnstore (default)</td>
+                    </tr>
+                </table>
+
+                <h4>Query Optimization:</h4>
+                <ul>
+                    <li><strong>Use WHERE Clauses:</strong> Filter early to reduce data scanned</li>
+                    <li><strong>Avoid SELECT *:</strong> Select only needed columns</li>
+                    <li><strong>Use Appropriate Joins:</strong> Choose right join type</li>
+                    <li><strong>Limit Result Sets:</strong> Use TOP or LIMIT</li>
+                    <li><strong>Analyze Query Plans:</strong> Use EXPLAIN to identify bottlenecks</li>
+                </ul>
+
+                <pre><code>-- Example: Optimized query
+SELECT
+    customer_id,
+    SUM(order_amount) as total_sales
+FROM orders
+WHERE order_date >= '2024-01-01'
+    AND status = 'Completed'
+GROUP BY customer_id
+HAVING SUM(order_amount) > 1000
+ORDER BY total_sales DESC;</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize Eventstreams and Eventhouses</h3>
+
+                <h4>Eventstream Optimization:</h4>
+                <ul>
+                    <li><strong>Partitioning:</strong> Use appropriate partition count for throughput</li>
+                    <li><strong>Batching:</strong> Batch events for better efficiency</li>
+                    <li><strong>Transformation:</strong> Keep transformations simple and fast</li>
+                    <li><strong>Destination:</strong> Optimize write patterns to destinations</li>
+                </ul>
+
+                <h4>Eventhouse/KQL Database Optimization:</h4>
+                <ul>
+                    <li><strong>Ingestion Batching:</strong>
+                        <pre><code>// Configure batching policy
+.alter table MyTable policy ingestionbatching
+@'{"MaximumBatchingTimeSpan":"00:00:30", "MaximumNumberOfItems": 500}'</code></pre>
+                    </li>
+                    <li><strong>Update Policy:</strong> Pre-aggregate data on ingestion
+                        <pre><code>// Create update policy for aggregation
+.alter table AggregatedData policy update
+@'[{"Source": "RawData", "Query": "RawData | summarize count() by bin(timestamp, 1h)"}]'</code></pre>
+                    </li>
+                    <li><strong>Caching Policy:</strong> Cache frequently accessed data
+                        <pre><code>// Set caching policy
+.alter table MyTable policy caching hot = 7d</code></pre>
+                    </li>
+                    <li><strong>Partitioning Policy:</strong> Partition large tables
+                        <pre><code>// Set partitioning policy
+.alter table MyTable policy partitioning
+@'{"PartitionKeys": [{"ColumnName": "timestamp", "Kind": "UniformRange", "Properties": {"RangeSize": "1.00:00:00"}}]}'</code></pre>
+                    </li>
+                </ul>
+
+                <div class="note">
+                    <strong>KQL Query Optimization:</strong> Use summarize instead of multiple aggregations, limit result sets, and leverage materialized views.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize Spark Performance</h3>
+
+                <h4>Spark Configuration Tuning:</h4>
+                <ul>
+                    <li><strong>Executor Configuration:</strong>
+                        <pre><code># Configure executors
+spark.conf.set("spark.executor.memory", "8g")
+spark.conf.set("spark.executor.cores", "4")
+spark.conf.set("spark.dynamicAllocation.enabled", "true")</code></pre>
+                    </li>
+                    <li><strong>Adaptive Query Execution:</strong>
+                        <pre><code># Enable AQE
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")</code></pre>
+                    </li>
+                    <li><strong>Broadcast Joins:</strong>
+                        <pre><code># Increase broadcast threshold
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", "100MB")</code></pre>
+                    </li>
+                </ul>
+
+                <h4>Code Optimization:</h4>
+                <ul>
+                    <li><strong>Caching:</strong> Cache frequently used DataFrames
+                        <pre><code>df.cache()  # or df.persist(StorageLevel.MEMORY_AND_DISK)</code></pre>
+                    </li>
+                    <li><strong>Partitioning:</strong> Repartition for better parallelism
+                        <pre><code>df.repartition(200, "customer_id")</code></pre>
+                    </li>
+                    <li><strong>Avoid Shuffles:</strong> Minimize data shuffling
+                        <ul>
+                            <li>Use broadcast joins for small tables</li>
+                            <li>Pre-partition data appropriately</li>
+                            <li>Avoid wide transformations when possible</li>
+                        </ul>
+                    </li>
+                    <li><strong>Filter Early:</strong> Apply filters before joins/aggregations
+                        <pre><code>df.filter(col("status") == "Active").join(other_df, "id")</code></pre>
+                    </li>
+                    <li><strong>Use Built-in Functions:</strong> Prefer Spark functions over UDFs
+                        <pre><code>from pyspark.sql.functions import upper, concat
+df.withColumn("full_name", concat(col("first"), col("last")))</code></pre>
+                    </li>
+                </ul>
+
+                <h4>Data Skew Handling:</h4>
+                <ul>
+                    <li>Identify skewed keys causing uneven partitions</li>
+                    <li>Use salting technique to distribute skewed data</li>
+                    <li>Enable adaptive query execution</li>
+                    <li>Use broadcast join for skewed joins</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Know how to identify and resolve Spark performance issues using Spark UI, configuration tuning, and code optimization.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Optimize Query Performance</h3>
+
+                <h4>General Query Optimization:</h4>
+                <ul>
+                    <li><strong>Indexing:</strong> Create appropriate indexes</li>
+                    <li><strong>Statistics:</strong> Keep statistics up to date</li>
+                    <li><strong>Query Rewriting:</strong> Simplify complex queries</li>
+                    <li><strong>Avoid Cursors:</strong> Use set-based operations</li>
+                    <li><strong>Parameterization:</strong> Use parameterized queries</li>
+                </ul>
+
+                <h4>Specific Optimizations by Tool:</h4>
+                <table>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Optimization</th>
+                    </tr>
+                    <tr>
+                        <td>T-SQL (Warehouse)</td>
+                        <td>
+                            • Use materialized views<br>
+                            • Enable result set caching<br>
+                            • Optimize joins and WHERE clauses<br>
+                            • Use columnstore indexes
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>PySpark (Lakehouse)</td>
+                        <td>
+                            • Cache DataFrames<br>
+                            • Use broadcast joins<br>
+                            • Optimize partitioning<br>
+                            • Enable adaptive query execution
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>KQL (Eventhouse)</td>
+                        <td>
+                            • Use summarize efficiently<br>
+                            • Limit result sets<br>
+                            • Leverage materialized views<br>
+                            • Use appropriate time filters
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="key-points">
+                    <h4>Performance Monitoring:</h4>
+                    <ul>
+                        <li>Use query execution plans to identify bottlenecks</li>
+                        <li>Monitor query duration and resource usage</li>
+                        <li>Set up alerts for slow queries</li>
+                        <li>Regularly review and optimize top queries</li>
+                        <li>Test performance changes in non-production first</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DP-700 Study Guide | Last Updated: January 2026</p>
+            <p>This is an unofficial study guide. For official information, visit <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700" target="_blank">Microsoft Learn</a></p>
+        </div>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implement & Manage Analytics Solution - DP-700 Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Implement and Manage an Analytics Solution</h1>
+            <p class="subtitle">30-35% of Exam Weight</p>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="implement-manage.html" class="active">Implement & Manage</a></li>
+                <li><a href="ingest-transform.html">Ingest & Transform</a></li>
+                <li><a href="monitor-optimize.html">Monitor & Optimize</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="quick-reference.html">Quick Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="workspace-settings" class="content-section">
+            <h2>Configure Microsoft Fabric Workspace Settings</h2>
+            
+            <div class="subsection">
+                <h3>Configure Spark Workspace Settings</h3>
+                <p>Spark workspace settings control the behavior and performance of Apache Spark in Microsoft Fabric. These settings are critical for optimizing performance, managing costs, and ensuring efficient resource utilization.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🏪 Grocery Store Analogy:</strong> Think of Spark like a grocery store's checkout system. The <strong>executors</strong> are like checkout lanes - more lanes (executors) mean you can process more customers (data) simultaneously. The <strong>executor memory</strong> is like the size of each checkout counter - bigger counters can handle larger shopping carts. <strong>Dynamic allocation</strong> is like opening more lanes during rush hour and closing them when it's quiet. <strong>Starter pools</strong> are like having cashiers already at their stations before customers arrive, so there's no wait time to open a lane.
+                </div>
+
+                <div class="key-points">
+                    <h4>Key Configuration Areas:</h4>
+                    <ul>
+                        <li><strong>Environment Settings:</strong> Configure default Spark pools and runtime versions</li>
+                        <li><strong>Compute Configuration:</strong> Set node sizes, autoscaling, and dynamic allocation</li>
+                        <li><strong>Library Management:</strong> Install custom libraries and packages</li>
+                        <li><strong>Spark Properties:</strong> Configure spark.conf settings for optimization</li>
+                        <li><strong>High Concurrency:</strong> Enable session pooling for better resource utilization</li>
+                        <li><strong>Starter Pools:</strong> Pre-warmed pools for faster job startup</li>
+                    </ul>
+                </div>
+
+                <h4>Spark Pool Configuration:</h4>
+                <p>Fabric offers different node sizes for Spark pools, each optimized for different workloads:</p>
+                <table>
+                    <tr>
+                        <th>Node Size</th>
+                        <th>Cores</th>
+                        <th>Memory</th>
+                        <th>Best For</th>
+                    </tr>
+                    <tr>
+                        <td>Small</td>
+                        <td>4 vCores</td>
+                        <td>32 GB</td>
+                        <td>Development, testing, small datasets</td>
+                    </tr>
+                    <tr>
+                        <td>Medium</td>
+                        <td>8 vCores</td>
+                        <td>64 GB</td>
+                        <td>Standard workloads, medium datasets</td>
+                    </tr>
+                    <tr>
+                        <td>Large</td>
+                        <td>16 vCores</td>
+                        <td>128 GB</td>
+                        <td>Large datasets, complex transformations</td>
+                    </tr>
+                    <tr>
+                        <td>X-Large</td>
+                        <td>32 vCores</td>
+                        <td>256 GB</td>
+                        <td>Very large datasets, intensive processing</td>
+                    </tr>
+                </table>
+
+                <h4>Important Spark Configuration Settings:</h4>
+                <table>
+                    <tr>
+                        <th>Setting</th>
+                        <th>Purpose</th>
+                        <th>Default</th>
+                        <th>Recommended Values</th>
+                    </tr>
+                    <tr>
+                        <td>spark.executor.memory</td>
+                        <td>Memory per executor</td>
+                        <td>Varies by node</td>
+                        <td>4g (small), 8g (medium), 16g (large)</td>
+                    </tr>
+                    <tr>
+                        <td>spark.executor.cores</td>
+                        <td>CPU cores per executor</td>
+                        <td>4</td>
+                        <td>2-8 depending on workload</td>
+                    </tr>
+                    <tr>
+                        <td>spark.dynamicAllocation.enabled</td>
+                        <td>Enable dynamic resource allocation</td>
+                        <td>true</td>
+                        <td>true for variable workloads</td>
+                    </tr>
+                    <tr>
+                        <td>spark.dynamicAllocation.minExecutors</td>
+                        <td>Minimum number of executors</td>
+                        <td>1</td>
+                        <td>1-2 for cost efficiency</td>
+                    </tr>
+                    <tr>
+                        <td>spark.dynamicAllocation.maxExecutors</td>
+                        <td>Maximum number of executors</td>
+                        <td>Varies</td>
+                        <td>Set based on capacity limits</td>
+                    </tr>
+                    <tr>
+                        <td>spark.sql.adaptive.enabled</td>
+                        <td>Enable adaptive query execution (AQE)</td>
+                        <td>true</td>
+                        <td>true - improves query performance</td>
+                    </tr>
+                    <tr>
+                        <td>spark.sql.adaptive.coalescePartitions.enabled</td>
+                        <td>Coalesce partitions after shuffle</td>
+                        <td>true</td>
+                        <td>true - reduces small partitions</td>
+                    </tr>
+                    <tr>
+                        <td>spark.sql.adaptive.skewJoin.enabled</td>
+                        <td>Handle skewed joins automatically</td>
+                        <td>true</td>
+                        <td>true - handles data skew</td>
+                    </tr>
+                    <tr>
+                        <td>spark.sql.autoBroadcastJoinThreshold</td>
+                        <td>Size threshold for broadcast joins</td>
+                        <td>10MB</td>
+                        <td>10MB-100MB based on data</td>
+                    </tr>
+                    <tr>
+                        <td>spark.sql.shuffle.partitions</td>
+                        <td>Number of partitions for shuffles</td>
+                        <td>200</td>
+                        <td>Adjust based on data size (100-1000)</td>
+                    </tr>
+                </table>
+
+                <h4>Configuring Spark Settings in Fabric:</h4>
+                <pre><code># Method 1: Notebook-level configuration
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")
+spark.conf.set("spark.executor.memory", "8g")
+
+# Method 2: Environment configuration (workspace settings)
+# Navigate to Workspace Settings > Data Engineering/Science > Spark Settings
+# Configure default environment with custom libraries and settings
+
+# Method 3: Inline configuration in notebook
+%%configure -f
+{
+    "conf": {
+        "spark.executor.memory": "8g",
+        "spark.executor.cores": "4",
+        "spark.dynamicAllocation.enabled": "true",
+        "spark.sql.adaptive.enabled": "true"
+    }
+}</code></pre>
+
+                <h4>Library Management:</h4>
+                <p>Install custom Python, R, or Scala libraries for your Spark environment:</p>
+                <ul>
+                    <li><strong>Built-in Libraries:</strong> Fabric includes common libraries (pandas, numpy, scikit-learn, etc.)</li>
+                    <li><strong>Custom Libraries:</strong> Upload .whl, .jar, or .tar.gz files</li>
+                    <li><strong>PyPI Packages:</strong> Install from PyPI using requirements.txt</li>
+                    <li><strong>Conda Packages:</strong> Use conda environment.yml files</li>
+                    <li><strong>Inline Installation:</strong> Use %pip install or %conda install in notebooks</li>
+                </ul>
+
+                <pre><code># Install libraries inline in notebook
+%pip install pandas==2.0.0 scikit-learn
+
+# Or use requirements.txt in environment configuration
+# pandas==2.0.0
+# scikit-learn==1.3.0
+# azure-storage-blob==12.19.0</code></pre>
+
+                <h4>Starter Pools (High Concurrency):</h4>
+                <p>Starter pools are pre-warmed Spark sessions that reduce startup time:</p>
+                <ul>
+                    <li><strong>Purpose:</strong> Eliminate cold start delays (can save 3-5 minutes)</li>
+                    <li><strong>Configuration:</strong> Set minimum number of pre-warmed sessions</li>
+                    <li><strong>Cost:</strong> Consumes capacity even when idle</li>
+                    <li><strong>Use Case:</strong> Interactive development, frequent notebook execution</li>
+                    <li><strong>Best Practice:</strong> Enable for production workspaces with frequent usage</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand the trade-offs between starter pools (faster startup, higher cost) and on-demand pools (slower startup, lower cost). Know when to use dynamic allocation vs. fixed executors.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Workspace-level Spark settings apply to all notebooks and Spark jobs within that workspace unless overridden at the item level. Item-level settings take precedence over workspace settings.
+                </div>
+
+                <h4>Monitoring Spark Configuration:</h4>
+                <ul>
+                    <li><strong>Spark UI:</strong> Access from notebook to view job execution details</li>
+                    <li><strong>Monitoring Hub:</strong> Track Spark job status and duration</li>
+                    <li><strong>Capacity Metrics:</strong> Monitor CU consumption for cost management</li>
+                    <li><strong>Performance Insights:</strong> Identify bottlenecks and optimization opportunities</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Configure Domain Workspace Settings</h3>
+                <p>Domains in Microsoft Fabric provide a logical grouping and governance mechanism for organizing workspaces across your organization. They enable centralized management, policy enforcement, and improved data discovery.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🏢 City Planning Analogy:</strong> Think of your Fabric tenant as a <strong>city</strong>. <strong>Domains</strong> are like <strong>neighborhoods</strong> (Sales District, Finance District, Operations District). Each <strong>workspace</strong> is like a <strong>building</strong> within that neighborhood. Just as city planners create zoning laws that apply to entire neighborhoods, domain admins set policies that apply to all workspaces in a domain. When someone wants to find a specific business (data), they can search by neighborhood (domain) rather than checking every building in the city.
+                </div>
+
+                <h4>Domain Architecture and Hierarchy:</h4>
+                <table>
+                    <tr>
+                        <th>Level</th>
+                        <th>Description</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Tenant</td>
+                        <td>Top-level organization</td>
+                        <td>Contains all domains and workspaces</td>
+                    </tr>
+                    <tr>
+                        <td>Domain</td>
+                        <td>Logical grouping (e.g., Sales, Finance, HR)</td>
+                        <td>Organize workspaces by business unit or function</td>
+                    </tr>
+                    <tr>
+                        <td>Workspace</td>
+                        <td>Container for Fabric items</td>
+                        <td>Actual work environment for data engineering</td>
+                    </tr>
+                    <tr>
+                        <td>Items</td>
+                        <td>Lakehouses, notebooks, pipelines, etc.</td>
+                        <td>Individual data assets and processes</td>
+                    </tr>
+                </table>
+
+                <h4>Domain Configuration Options:</h4>
+                <ul>
+                    <li><strong>Workspace Assignment:</strong> Assign workspaces to specific domains for organizational structure</li>
+                    <li><strong>Domain Roles:</strong> Domain admins, contributors, and viewers with specific permissions</li>
+                    <li><strong>Governance Policies:</strong> Apply organization-wide policies for compliance and security</li>
+                    <li><strong>Data Discovery:</strong> Enable data catalog and discovery features across domain</li>
+                    <li><strong>Endorsement:</strong> Promote and certify content within domains (Promoted, Certified)</li>
+                    <li><strong>Default Settings:</strong> Set default capacity, sensitivity labels, and retention policies</li>
+                    <li><strong>Access Control:</strong> Manage who can create workspaces in the domain</li>
+                </ul>
+
+                <h4>Domain Roles and Permissions:</h4>
+                <table>
+                    <tr>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Domain Admin</td>
+                        <td>Full control: create/delete domains, assign workspaces, manage settings</td>
+                        <td>IT administrators, data governance team</td>
+                    </tr>
+                    <tr>
+                        <td>Domain Contributor</td>
+                        <td>Create workspaces, assign items, view domain content</td>
+                        <td>Data engineers, business analysts</td>
+                    </tr>
+                    <tr>
+                        <td>Domain Viewer</td>
+                        <td>View domain structure and endorsed content</td>
+                        <td>Business users, stakeholders</td>
+                    </tr>
+                </table>
+
+                <h4>Implementing Domain Strategy:</h4>
+                <pre><code># Example domain organization structure:
+
+Organization: Contoso Corp
+├── Sales Domain
+│   ├── Sales Analytics Workspace
+│   ├── Customer Insights Workspace
+│   └── Revenue Forecasting Workspace
+├── Finance Domain
+│   ├── Financial Reporting Workspace
+│   ├── Budget Planning Workspace
+│   └── Audit & Compliance Workspace
+├── Operations Domain
+│   ├── Supply Chain Workspace
+│   ├── Inventory Management Workspace
+│   └── Logistics Workspace
+└── Shared Services Domain
+    ├── Data Platform Workspace
+    ├── Master Data Workspace
+    └── Reference Data Workspace</code></pre>
+
+                <h4>Domain Governance Features:</h4>
+                <div class="key-points">
+                    <h5>1. Centralized Policy Management:</h5>
+                    <ul>
+                        <li>Apply sensitivity labels automatically to all items in domain</li>
+                        <li>Enforce retention policies for data lifecycle management</li>
+                        <li>Set default security settings for new workspaces</li>
+                        <li>Control external sharing and guest access</li>
+                    </ul>
+
+                    <h5>2. Data Discovery and Cataloging:</h5>
+                    <ul>
+                        <li>Enable automatic metadata extraction and indexing</li>
+                        <li>Create business glossary terms for domain</li>
+                        <li>Tag and classify data assets</li>
+                        <li>Enable search across all domain workspaces</li>
+                    </ul>
+
+                    <h5>3. Content Endorsement:</h5>
+                    <ul>
+                        <li><strong>Promoted:</strong> Recommended content, vetted by workspace owners</li>
+                        <li><strong>Certified:</strong> Officially approved content, meets quality standards</li>
+                        <li><strong>Endorsement Process:</strong> Define approval workflows and criteria</li>
+                        <li><strong>Visibility:</strong> Endorsed content appears prominently in search and catalogs</li>
+                    </ul>
+                </div>
+
+                <h4>Best Practices for Domain Configuration:</h4>
+                <ul>
+                    <li><strong>Align with Business Structure:</strong> Create domains that match organizational units</li>
+                    <li><strong>Limit Domain Count:</strong> Too many domains create complexity (5-15 is typical)</li>
+                    <li><strong>Shared Services Domain:</strong> Create a domain for common/shared resources</li>
+                    <li><strong>Naming Conventions:</strong> Use clear, consistent naming (e.g., "Finance-Production", "Sales-Development")</li>
+                    <li><strong>Access Reviews:</strong> Regularly review and audit domain access</li>
+                    <li><strong>Documentation:</strong> Document domain purpose, ownership, and policies</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand the difference between domains (logical organization) and workspaces (actual containers). Know that domains enable governance at scale and improve data discovery. Be familiar with domain roles and their permissions.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Domains provide a logical grouping mechanism for workspaces, making it easier to manage large-scale Fabric deployments. A workspace can only belong to one domain at a time, but can be reassigned to different domains.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Configure OneLake Workspace Settings</h3>
+                <p>OneLake is the unified, hierarchical data lake for Microsoft Fabric that provides a single SaaS storage layer for all data across the organization. It's built on Azure Data Lake Storage (ADLS) Gen2 and uses the Delta Lake format by default.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🏞️ Lake Analogy:</strong> <strong>OneLake</strong> is literally like a <strong>lake</strong> where all your organization's data flows. Every workspace has its own <strong>dock</strong> on the lake. <strong>Shortcuts</strong> are like <strong>bridges</strong> that connect your lake to other bodies of water (AWS S3, Azure Storage) - you can see and access the water in those other lakes without pumping it into yours. The <strong>Delta Lake format</strong> is like having a filtration system that keeps the water clean and lets you see what the lake looked like at any point in time (time travel).
+                </div>
+
+                <h4>OneLake Architecture:</h4>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td>OneLake Storage</td>
+                        <td>Centralized data lake storage</td>
+                        <td>Automatic, no configuration needed, ADLS Gen2 compatible</td>
+                    </tr>
+                    <tr>
+                        <td>Workspaces</td>
+                        <td>Logical containers in OneLake</td>
+                        <td>Each workspace gets its own OneLake folder</td>
+                    </tr>
+                    <tr>
+                        <td>Items</td>
+                        <td>Data assets (Lakehouses, Warehouses)</td>
+                        <td>Each item has Tables and Files folders</td>
+                    </tr>
+                    <tr>
+                        <td>Shortcuts</td>
+                        <td>Virtual links to external data</td>
+                        <td>Access data without copying or moving</td>
+                    </tr>
+                </table>
+
+                <h4>OneLake Storage Structure:</h4>
+                <pre><code>OneLake
+└── Workspace Name
+    ├── Lakehouse Name
+    │   ├── Tables (managed Delta tables)
+    │   │   ├── table1
+    │   │   └── table2
+    │   └── Files (unstructured data)
+    │       ├── raw/
+    │       ├── processed/
+    │       └── shortcuts/
+    └── Warehouse Name
+        └── Tables (SQL tables)</code></pre>
+
+                <h4>OneLake Shortcuts - Detailed Configuration:</h4>
+                <p>Shortcuts are symbolic links that enable you to access data stored in external systems without copying or moving it. They appear as folders in OneLake but point to external storage.</p>
+
+                <div class="note" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0;">
+                    <strong>📚 Library Analogy:</strong> Think of <strong>shortcuts</strong> like <strong>interlibrary loan cards</strong> in a library catalog. Instead of buying duplicate copies of books from other libraries (copying data), you create a catalog card that points to the book's location in another library. When someone requests the book (queries the data), the library retrieves it from the other location. The book stays where it is, but your patrons can access it as if it were on your shelf. This saves shelf space (storage costs) but takes longer to retrieve (network latency).
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Shortcut Type</th>
+                        <th>Source</th>
+                        <th>Authentication</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>ADLS Gen2</td>
+                        <td>Azure Data Lake Storage Gen2</td>
+                        <td>Account Key, SAS Token, Service Principal, Organizational Account</td>
+                        <td>Access existing Azure data lakes</td>
+                    </tr>
+                    <tr>
+                        <td>Amazon S3</td>
+                        <td>AWS S3 buckets</td>
+                        <td>Access Key ID and Secret Access Key</td>
+                        <td>Multi-cloud scenarios, AWS data integration</td>
+                    </tr>
+                    <tr>
+                        <td>Google Cloud Storage</td>
+                        <td>GCS buckets</td>
+                        <td>HMAC keys</td>
+                        <td>Multi-cloud scenarios, GCP data integration</td>
+                    </tr>
+                    <tr>
+                        <td>Dataverse</td>
+                        <td>Microsoft Dataverse</td>
+                        <td>Organizational Account</td>
+                        <td>Access Dynamics 365 and Power Platform data</td>
+                    </tr>
+                    <tr>
+                        <td>OneLake</td>
+                        <td>Other OneLake locations</td>
+                        <td>Fabric permissions</td>
+                        <td>Share data across workspaces</td>
+                    </tr>
+                </table>
+
+                <h4>Creating Shortcuts - Step by Step:</h4>
+                <pre><code># Creating a shortcut to ADLS Gen2:
+1. Navigate to Lakehouse → Files folder
+2. Click "New shortcut"
+3. Select "Azure Data Lake Storage Gen2"
+4. Provide connection details:
+   - URL: https://storageaccount.dfs.core.windows.net/container/path
+   - Authentication: Choose method (Account Key, SAS, Service Principal)
+   - Credentials: Provide authentication details
+5. Name the shortcut
+6. Click "Create"
+
+# The shortcut appears as a folder in OneLake
+# Data is accessed in real-time from the source
+# No data is copied or moved</code></pre>
+
+                <h4>Shortcut Benefits and Considerations:</h4>
+                <div class="key-points">
+                    <h5>Benefits:</h5>
+                    <ul>
+                        <li><strong>No Data Duplication:</strong> Access data without copying, saving storage costs</li>
+                        <li><strong>Real-Time Access:</strong> Always access the latest data from source</li>
+                        <li><strong>Multi-Cloud Support:</strong> Integrate data from Azure, AWS, GCP</li>
+                        <li><strong>Simplified Architecture:</strong> Single interface for all data sources</li>
+                        <li><strong>Reduced ETL:</strong> Eliminate data movement pipelines</li>
+                    </ul>
+
+                    <h5>Considerations:</h5>
+                    <ul>
+                        <li><strong>Performance:</strong> Slower than native OneLake data (network latency)</li>
+                        <li><strong>Compute Costs:</strong> Reading shortcut data consumes capacity units</li>
+                        <li><strong>Dependency:</strong> Relies on external system availability</li>
+                        <li><strong>Security:</strong> Manage credentials and access carefully</li>
+                        <li><strong>Limitations:</strong> Some operations may not be supported on shortcut data</li>
+                    </ul>
+                </div>
+
+                <h4>OneLake Data Access Patterns:</h4>
+                <table>
+                    <tr>
+                        <th>Access Method</th>
+                        <th>Protocol</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Fabric Experiences</td>
+                        <td>Native Fabric APIs</td>
+                        <td>Notebooks, pipelines, dataflows, Power BI</td>
+                    </tr>
+                    <tr>
+                        <td>ABFS Driver</td>
+                        <td>abfss://</td>
+                        <td>Spark applications, external tools</td>
+                    </tr>
+                    <tr>
+                        <td>OneLake File Explorer</td>
+                        <td>Windows Explorer integration</td>
+                        <td>Desktop access, file management</td>
+                    </tr>
+                    <tr>
+                        <td>REST APIs</td>
+                        <td>HTTPS</td>
+                        <td>Custom applications, automation</td>
+                    </tr>
+                </table>
+
+                <h4>OneLake Security and Permissions:</h4>
+                <ul>
+                    <li><strong>Workspace Roles:</strong> Admin, Member, Contributor, Viewer control access</li>
+                    <li><strong>Item Permissions:</strong> Share individual lakehouses with specific users</li>
+                    <li><strong>Folder-Level Security:</strong> Not supported - use workspace/item permissions</li>
+                    <li><strong>Row-Level Security:</strong> Implement in semantic models, not in OneLake</li>
+                    <li><strong>Encryption:</strong> Automatic encryption at rest and in transit</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand the difference between shortcuts (virtual links) and mirroring (replication). Know when to use shortcuts vs. copying data. Be familiar with supported shortcut sources and authentication methods. Remember that shortcuts consume compute when accessed.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> OneLake is automatically provisioned for every Fabric tenant - no setup required. Each workspace gets its own OneLake folder. OneLake uses the Delta Lake format by default, providing ACID transactions and time travel capabilities.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Configure Data Workflow Workspace Settings</h3>
+                <p>Data workflow settings control how data pipelines, dataflows, and orchestration processes execute in Microsoft Fabric. Proper configuration ensures reliable, performant, and cost-effective data integration.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🏭 Factory Assembly Line Analogy:</strong> Think of <strong>data pipelines</strong> as <strong>assembly lines</strong> in a factory. The <strong>Integration Runtime</strong> is the factory floor where work happens. <strong>Activities</strong> are individual workstations on the line. <strong>Retry policies</strong> are like quality control - if a part fails inspection (activity fails), try again a few times before stopping the line. <strong>Parallelism</strong> is like having multiple assembly lines running simultaneously. <strong>Parameters</strong> are like adjustable settings on machines - you can configure them differently for making toy cars (dev) vs. real cars (production).
+                </div>
+
+                <h4>Integration Runtime Configuration:</h4>
+                <p>The Integration Runtime (IR) is the compute infrastructure used by pipelines and dataflows to execute activities.</p>
+
+                <table>
+                    <tr>
+                        <th>Runtime Type</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Azure IR (Default)</td>
+                        <td>Managed cloud compute in Azure</td>
+                        <td>Cloud-to-cloud data movement, cloud transformations</td>
+                    </tr>
+                    <tr>
+                        <td>Self-Hosted IR</td>
+                        <td>On-premises or VM-based runtime</td>
+                        <td>Access on-premises data sources, private networks</td>
+                    </tr>
+                    <tr>
+                        <td>Fabric Runtime</td>
+                        <td>Native Fabric compute</td>
+                        <td>Dataflow Gen2, Fabric-native operations</td>
+                    </tr>
+                </table>
+
+                <h4>Pipeline Activity Settings:</h4>
+                <table>
+                    <tr>
+                        <th>Setting</th>
+                        <th>Purpose</th>
+                        <th>Default</th>
+                        <th>Recommended</th>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>Maximum activity execution time</td>
+                        <td>7 days</td>
+                        <td>Set based on expected duration (1-24 hours typical)</td>
+                    </tr>
+                    <tr>
+                        <td>Retry Count</td>
+                        <td>Number of retry attempts on failure</td>
+                        <td>0</td>
+                        <td>3 for transient errors, 0 for data quality issues</td>
+                    </tr>
+                    <tr>
+                        <td>Retry Interval</td>
+                        <td>Wait time between retries</td>
+                        <td>30 seconds</td>
+                        <td>30-300 seconds with exponential backoff</td>
+                    </tr>
+                    <tr>
+                        <td>Secure Output</td>
+                        <td>Hide activity output in logs</td>
+                        <td>false</td>
+                        <td>true for sensitive data</td>
+                    </tr>
+                    <tr>
+                        <td>Secure Input</td>
+                        <td>Hide activity input in logs</td>
+                        <td>false</td>
+                        <td>true for credentials, PII</td>
+                    </tr>
+                </table>
+
+                <h4>Concurrency and Parallelism:</h4>
+                <pre><code># Pipeline-level concurrency
+{
+    "name": "DataPipeline",
+    "properties": {
+        "concurrency": 5,  // Max 5 concurrent runs
+        "activities": [
+            {
+                "name": "ForEachActivity",
+                "type": "ForEach",
+                "typeProperties": {
+                    "batchCount": 10,  // Process 10 items in parallel
+                    "isSequential": false
+                }
+            }
+        ]
+    }
+}
+
+# Activity-level parallelism
+# Copy activity with parallel copies
+{
+    "name": "CopyData",
+    "type": "Copy",
+    "typeProperties": {
+        "parallelCopies": 32,  // Number of parallel threads
+        "dataIntegrationUnits": 4  // DIU for cloud copy
+    }
+}</code></pre>
+
+                <h4>Retry Policy Configuration:</h4>
+                <div class="key-points">
+                    <h5>Retry Strategies:</h5>
+                    <ul>
+                        <li><strong>Fixed Interval:</strong> Same wait time between retries (e.g., 30 seconds)</li>
+                        <li><strong>Exponential Backoff:</strong> Increasing wait time (30s, 60s, 120s, 240s)</li>
+                        <li><strong>Immediate Retry:</strong> No wait time (use cautiously)</li>
+                    </ul>
+
+                    <h5>When to Retry:</h5>
+                    <ul>
+                        <li>✅ Network timeouts and transient errors</li>
+                        <li>✅ Source/destination temporarily unavailable</li>
+                        <li>✅ Rate limiting or throttling errors</li>
+                        <li>❌ Data quality or validation errors</li>
+                        <li>❌ Authentication or permission errors</li>
+                        <li>❌ Schema mismatch or structural errors</li>
+                    </ul>
+                </div>
+
+                <h4>Logging and Monitoring Configuration:</h4>
+                <table>
+                    <tr>
+                        <th>Log Type</th>
+                        <th>Information Captured</th>
+                        <th>Retention</th>
+                    </tr>
+                    <tr>
+                        <td>Activity Runs</td>
+                        <td>Start time, end time, status, duration, errors</td>
+                        <td>45 days</td>
+                    </tr>
+                    <tr>
+                        <td>Pipeline Runs</td>
+                        <td>Trigger info, parameters, overall status</td>
+                        <td>45 days</td>
+                    </tr>
+                    <tr>
+                        <td>Copy Activity Details</td>
+                        <td>Rows read/written, throughput, DIU usage</td>
+                        <td>45 days</td>
+                    </tr>
+                    <tr>
+                        <td>Error Messages</td>
+                        <td>Detailed error information, stack traces</td>
+                        <td>45 days</td>
+                    </tr>
+                </table>
+
+                <h4>Pipeline Parameters and Variables:</h4>
+                <pre><code># Define pipeline parameters for flexibility
+{
+    "parameters": {
+        "SourcePath": {
+            "type": "String",
+            "defaultValue": "/data/raw"
+        },
+        "TargetTable": {
+            "type": "String"
+        },
+        "ProcessDate": {
+            "type": "String",
+            "defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd')"
+        }
+    },
+    "variables": {
+        "RowCount": {
+            "type": "Integer",
+            "defaultValue": 0
+        },
+        "ErrorMessage": {
+            "type": "String"
+        }
+    }
+}
+
+# Use parameters in activities
+@pipeline().parameters.SourcePath
+@pipeline().parameters.TargetTable
+@variables('RowCount')</code></pre>
+
+                <h4>Workflow Best Practices:</h4>
+                <ul>
+                    <li><strong>Parameterization:</strong> Use parameters for paths, table names, dates - avoid hardcoding</li>
+                    <li><strong>Error Handling:</strong> Implement try-catch patterns with failure paths</li>
+                    <li><strong>Logging:</strong> Log key metrics (row counts, duration) to custom tables</li>
+                    <li><strong>Idempotency:</strong> Design pipelines to be safely re-runnable</li>
+                    <li><strong>Modular Design:</strong> Break complex workflows into smaller, reusable pipelines</li>
+                    <li><strong>Dependency Management:</strong> Use dependencies and precedence constraints</li>
+                    <li><strong>Resource Optimization:</strong> Right-size DIUs and parallel copies</li>
+                    <li><strong>Monitoring:</strong> Set up alerts for failures and SLA breaches</li>
+                </ul>
+
+                <h4>Common Pipeline Patterns:</h4>
+                <div class="key-points">
+                    <h5>1. Incremental Load Pattern:</h5>
+                    <pre><code>Lookup (Get Max Watermark)
+  → Copy Data (WHERE modified_date > watermark)
+    → Update Watermark Table</code></pre>
+
+                    <h5>2. Error Handling Pattern:</h5>
+                    <pre><code>Try: Copy Data Activity
+  → On Success: Log Success
+  → On Failure: Log Error → Send Alert → Move to Error Folder</code></pre>
+
+                    <h5>3. Parallel Processing Pattern:</h5>
+                    <pre><code>Get Metadata (List Files)
+  → ForEach (Parallel)
+    → Copy Each File
+      → Transform
+        → Load</code></pre>
+                </div>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Know the difference between Azure IR and Self-Hosted IR. Understand when to use retry policies and when not to. Be familiar with pipeline parameters, variables, and expressions. Know how to configure parallelism for performance optimization.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Fabric pipelines are based on Azure Data Factory but with simplified management - no need to provision integration runtimes manually. The Fabric runtime is automatically available for all Dataflow Gen2 operations.
+                </div>
+            </div>
+        </section>
+
+        <section id="lifecycle" class="content-section">
+            <h2>Implement Lifecycle Management in Fabric</h2>
+            
+            <div class="subsection">
+                <h3>Configure Version Control with Git Integration</h3>
+                <p>Git integration in Microsoft Fabric enables source control, collaboration, and version history for your data engineering artifacts. This is essential for team collaboration, change tracking, and implementing proper DevOps practices.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>📝 Document Version Control Analogy:</strong> Think of <strong>Git</strong> like <strong>Google Docs version history</strong> on steroids. Every time you save (commit), Git takes a snapshot of your entire project. <strong>Branches</strong> are like making a copy of a document to try out different ideas - you can work on "Version 2 - Bold Redesign" while keeping "Version 1 - Original" safe. <strong>Pull requests</strong> are like asking colleagues to review your changes before merging them into the official document. <strong>Merge conflicts</strong> happen when two people edit the same paragraph differently - someone needs to decide which version to keep.
+                </div>
+
+                <h4>Supported Git Providers:</h4>
+                <table>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Authentication</th>
+                        <th>Features</th>
+                    </tr>
+                    <tr>
+                        <td>Azure DevOps</td>
+                        <td>Azure AD, Personal Access Token (PAT)</td>
+                        <td>Full integration, Azure Pipelines, Work Items</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub</td>
+                        <td>OAuth, Personal Access Token (PAT)</td>
+                        <td>GitHub Actions, Pull Requests, Issues</td>
+                    </tr>
+                    <tr>
+                        <td>GitLab</td>
+                        <td>Via Azure DevOps integration</td>
+                        <td>Limited support through mirroring</td>
+                    </tr>
+                </table>
+
+                <h4>Git-Supported Fabric Items:</h4>
+                <table>
+                    <tr>
+                        <th>Item Type</th>
+                        <th>Git Support</th>
+                        <th>File Format</th>
+                    </tr>
+                    <tr>
+                        <td>Notebooks</td>
+                        <td>✅ Yes</td>
+                        <td>.ipynb (Jupyter Notebook)</td>
+                    </tr>
+                    <tr>
+                        <td>Data Pipelines</td>
+                        <td>✅ Yes</td>
+                        <td>.json (Pipeline definition)</td>
+                    </tr>
+                    <tr>
+                        <td>Dataflow Gen2</td>
+                        <td>✅ Yes</td>
+                        <td>.json (Dataflow definition)</td>
+                    </tr>
+                    <tr>
+                        <td>Spark Job Definitions</td>
+                        <td>✅ Yes</td>
+                        <td>.json + code files</td>
+                    </tr>
+                    <tr>
+                        <td>Environments</td>
+                        <td>✅ Yes</td>
+                        <td>.yml (Environment config)</td>
+                    </tr>
+                    <tr>
+                        <td>Lakehouses</td>
+                        <td>⚠️ Partial (metadata only)</td>
+                        <td>.json (metadata, not data)</td>
+                    </tr>
+                    <tr>
+                        <td>Data Warehouses</td>
+                        <td>⚠️ Partial (metadata only)</td>
+                        <td>.json (metadata, not data)</td>
+                    </tr>
+                    <tr>
+                        <td>Semantic Models</td>
+                        <td>❌ No</td>
+                        <td>Use deployment pipelines instead</td>
+                    </tr>
+                    <tr>
+                        <td>Reports</td>
+                        <td>❌ No</td>
+                        <td>Use deployment pipelines instead</td>
+                    </tr>
+                </table>
+
+                <h4>Git Integration Workflow - Step by Step:</h4>
+                <pre><code># Step 1: Connect Workspace to Git Repository
+1. Navigate to Workspace Settings
+2. Select "Git integration"
+3. Choose provider (Azure DevOps or GitHub)
+4. Authenticate with PAT or OAuth
+5. Select organization, project, repository, and branch
+6. Click "Connect and sync"
+
+# Step 2: Initial Sync
+- Fabric syncs workspace items to Git repository
+- Creates folder structure in repo
+- Commits initial state
+
+# Step 3: Development Workflow
+1. Make changes in Fabric workspace
+2. Review changes in "Source control" panel
+3. Commit changes with message
+4. Push to remote repository
+
+# Step 4: Branch Management
+1. Create feature branch in Git provider
+2. Switch workspace to feature branch
+3. Make and commit changes
+4. Create pull request
+5. Review and merge to main branch
+6. Switch workspace back to main branch</code></pre>
+
+                <h4>Git Repository Structure:</h4>
+                <pre><code>my-fabric-repo/
+├── .fabric/
+│   └── workspace.json          # Workspace metadata
+├── Notebooks/
+│   ├── DataProcessing.ipynb
+│   └── DataQuality.ipynb
+├── Pipelines/
+│   ├── IngestPipeline.json
+│   └── TransformPipeline.json
+├── Dataflows/
+│   └── CustomerDataflow.json
+├── SparkJobDefinitions/
+│   └── BatchJob.json
+├── Environments/
+│   └── ProductionEnv.yml
+└── README.md</code></pre>
+
+                <h4>Git Operations in Fabric:</h4>
+                <table>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Description</th>
+                        <th>When to Use</th>
+                    </tr>
+                    <tr>
+                        <td>Commit</td>
+                        <td>Save changes to local Git history</td>
+                        <td>After completing a logical unit of work</td>
+                    </tr>
+                    <tr>
+                        <td>Push</td>
+                        <td>Upload commits to remote repository</td>
+                        <td>Share changes with team, backup work</td>
+                    </tr>
+                    <tr>
+                        <td>Pull</td>
+                        <td>Download changes from remote repository</td>
+                        <td>Get latest changes from team members</td>
+                    </tr>
+                    <tr>
+                        <td>Sync</td>
+                        <td>Pull + Push in one operation</td>
+                        <td>Keep workspace and repo in sync</td>
+                    </tr>
+                    <tr>
+                        <td>Branch Switch</td>
+                        <td>Change workspace to different branch</td>
+                        <td>Work on features, hotfixes, releases</td>
+                    </tr>
+                    <tr>
+                        <td>Undo</td>
+                        <td>Discard uncommitted changes</td>
+                        <td>Revert mistakes before committing</td>
+                    </tr>
+                </table>
+
+                <h4>Branching Strategies for Fabric:</h4>
+                <div class="key-points">
+                    <h5>1. GitFlow Strategy:</h5>
+                    <pre><code>main (production-ready code)
+├── develop (integration branch)
+│   ├── feature/new-pipeline
+│   ├── feature/data-quality
+│   └── feature/performance-optimization
+├── release/v1.0
+└── hotfix/critical-bug</code></pre>
+
+                    <h5>2. Trunk-Based Development:</h5>
+                    <pre><code>main (always deployable)
+├── short-lived feature branches (1-2 days)
+└── frequent merges to main</code></pre>
+
+                    <h5>3. Environment Branches:</h5>
+                    <pre><code>main (production)
+├── test (testing environment)
+└── dev (development environment)</code></pre>
+                </div>
+
+                <h4>Best Practices for Git Integration:</h4>
+                <ul>
+                    <li><strong>Commit Frequently:</strong> Small, focused commits with clear messages</li>
+                    <li><strong>Meaningful Messages:</strong> Use descriptive commit messages (e.g., "Add incremental load logic to sales pipeline")</li>
+                    <li><strong>Branch Protection:</strong> Protect main/production branches, require pull requests</li>
+                    <li><strong>Code Reviews:</strong> Use pull requests for peer review before merging</li>
+                    <li><strong>Sync Regularly:</strong> Pull changes frequently to avoid conflicts</li>
+                    <li><strong>Conflict Resolution:</strong> Resolve conflicts in Git provider, then sync to Fabric</li>
+                    <li><strong>.gitignore:</strong> Exclude temporary files, credentials, large data files</li>
+                    <li><strong>Documentation:</strong> Maintain README.md with setup instructions</li>
+                </ul>
+
+                <h4>Git Integration Limitations:</h4>
+                <ul>
+                    <li>❌ Data is NOT stored in Git (only metadata and code)</li>
+                    <li>❌ Semantic models and reports not supported (use deployment pipelines)</li>
+                    <li>❌ Cannot merge conflicts in Fabric UI (must use Git provider)</li>
+                    <li>❌ One workspace can connect to one branch at a time</li>
+                    <li>⚠️ Large notebooks (>10MB) may have performance issues</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Know which Fabric items support Git integration (notebooks, pipelines, dataflows, Spark jobs, environments) and which don't (semantic models, reports). Understand that Git stores code and metadata, NOT data. Know the difference between Git integration and deployment pipelines - use both together for complete CI/CD.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Git integration is workspace-level, not item-level. When you connect a workspace to Git, all supported items in that workspace are tracked. You can selectively commit items, but the connection is at the workspace level.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Database Projects</h3>
+                <p>Database projects enable version control and CI/CD for SQL databases in Fabric.</p>
+
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>SQL Database Projects:</strong> Store database schema as code</li>
+                    <li><strong>Schema Comparison:</strong> Compare and sync database schemas</li>
+                    <li><strong>Deployment Scripts:</strong> Generate deployment scripts for changes</li>
+                    <li><strong>Version History:</strong> Track schema changes over time</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Best Practice:</strong> Use database projects to maintain consistency across development, test, and production environments.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Create and Configure Deployment Pipelines</h3>
+                <p>Deployment pipelines in Microsoft Fabric enable automated, controlled promotion of content across environments (Development → Test → Production). They provide a structured approach to releasing changes while maintaining quality and stability.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🏗️ Construction Permit Analogy:</strong> Think of <strong>deployment pipelines</strong> like the <strong>building permit process</strong>. You start with <strong>blueprints</strong> (development environment) where architects can experiment freely. Then you submit for <strong>review</strong> (test environment) where inspectors check if everything meets code. Finally, you get <strong>approval to build</strong> (production environment) where real people will use the building. <strong>Deployment rules</strong> are like building codes - they ensure that when you move from blueprints to construction, certain things automatically adjust (like using fire-rated materials in production but cheaper alternatives in the model). You can't skip straight to construction without passing inspection!
+                </div>
+
+                <h4>Deployment Pipeline Architecture:</h4>
+                <table>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Purpose</th>
+                        <th>Typical Use</th>
+                        <th>Access Control</th>
+                    </tr>
+                    <tr>
+                        <td>Development</td>
+                        <td>Active development and experimentation</td>
+                        <td>Create, modify, test new features</td>
+                        <td>Data engineers, developers (full access)</td>
+                    </tr>
+                    <tr>
+                        <td>Test/QA</td>
+                        <td>Quality assurance and validation</td>
+                        <td>Test with production-like data, UAT</td>
+                        <td>QA team, business analysts (read/test)</td>
+                    </tr>
+                    <tr>
+                        <td>Production</td>
+                        <td>Live environment for end users</td>
+                        <td>Stable, validated, approved content</td>
+                        <td>End users (read-only), admins (deploy)</td>
+                    </tr>
+                </table>
+
+                <h4>Creating a Deployment Pipeline:</h4>
+                <pre><code># Step 1: Create Deployment Pipeline
+1. Navigate to Deployment pipelines in Fabric portal
+2. Click "New pipeline"
+3. Name the pipeline (e.g., "Sales Analytics Pipeline")
+4. Configure stages (Dev, Test, Prod)
+
+# Step 2: Assign Workspaces to Stages
+1. Click "Assign workspace" for each stage
+2. Select existing workspace or create new one
+3. Development → Dev_SalesAnalytics workspace
+4. Test → Test_SalesAnalytics workspace
+5. Production → Prod_SalesAnalytics workspace
+
+# Step 3: Configure Deployment Rules
+1. Select items to configure
+2. Set parameter rules for each stage
+3. Example: Database connection strings differ per environment
+
+# Step 4: Deploy Content
+1. Review changes in comparison view
+2. Select items to deploy
+3. Click "Deploy to test" or "Deploy to production"
+4. Monitor deployment progress</code></pre>
+
+                <h4>Supported Items in Deployment Pipelines:</h4>
+                <table>
+                    <tr>
+                        <th>Item Type</th>
+                        <th>Deployment Support</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>Lakehouses</td>
+                        <td>✅ Full</td>
+                        <td>Metadata and structure (not data)</td>
+                    </tr>
+                    <tr>
+                        <td>Data Warehouses</td>
+                        <td>✅ Full</td>
+                        <td>Schema and objects (not data)</td>
+                    </tr>
+                    <tr>
+                        <td>Notebooks</td>
+                        <td>✅ Full</td>
+                        <td>Code and configuration</td>
+                    </tr>
+                    <tr>
+                        <td>Dataflow Gen2</td>
+                        <td>✅ Full</td>
+                        <td>Transformation logic</td>
+                    </tr>
+                    <tr>
+                        <td>Data Pipelines</td>
+                        <td>✅ Full</td>
+                        <td>Pipeline definition and activities</td>
+                    </tr>
+                    <tr>
+                        <td>Semantic Models</td>
+                        <td>✅ Full</td>
+                        <td>Model definition, relationships, measures</td>
+                    </tr>
+                    <tr>
+                        <td>Reports</td>
+                        <td>✅ Full</td>
+                        <td>Report layout and visuals</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboards</td>
+                        <td>✅ Full</td>
+                        <td>Dashboard tiles and layout</td>
+                    </tr>
+                    <tr>
+                        <td>Eventstreams</td>
+                        <td>✅ Full</td>
+                        <td>Stream definition</td>
+                    </tr>
+                    <tr>
+                        <td>KQL Databases</td>
+                        <td>✅ Full</td>
+                        <td>Schema (not data)</td>
+                    </tr>
+                </table>
+
+                <h4>Deployment Rules - Detailed Configuration:</h4>
+                <p>Deployment rules allow you to parameterize settings that differ between environments, such as connection strings, file paths, or API endpoints.</p>
+
+                <table>
+                    <tr>
+                        <th>Rule Type</th>
+                        <th>Applies To</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Data Source Rules</td>
+                        <td>Semantic models, Dataflows</td>
+                        <td>Dev DB: dev-sql.database.windows.net<br>Prod DB: prod-sql.database.windows.net</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter Rules</td>
+                        <td>Reports, Semantic models</td>
+                        <td>Dev: @StartDate = '2024-01-01'<br>Prod: @StartDate = '2023-01-01'</td>
+                    </tr>
+                    <tr>
+                        <td>Lakehouse Rules</td>
+                        <td>Notebooks, Pipelines</td>
+                        <td>Dev: DevLakehouse<br>Prod: ProdLakehouse</td>
+                    </tr>
+                    <tr>
+                        <td>Warehouse Rules</td>
+                        <td>Semantic models, Reports</td>
+                        <td>Dev: DevWarehouse<br>Prod: ProdWarehouse</td>
+                    </tr>
+                </table>
+
+                <h4>Configuring Deployment Rules Example:</h4>
+                <pre><code># Example: Configure data source rule for semantic model
+{
+    "ItemType": "SemanticModel",
+    "ItemName": "SalesModel",
+    "RuleType": "DataSource",
+    "Development": {
+        "Server": "dev-sql.database.windows.net",
+        "Database": "SalesDB_Dev"
+    },
+    "Test": {
+        "Server": "test-sql.database.windows.net",
+        "Database": "SalesDB_Test"
+    },
+    "Production": {
+        "Server": "prod-sql.database.windows.net",
+        "Database": "SalesDB_Prod"
+    }
+}
+
+# Example: Configure parameter rule for pipeline
+{
+    "ItemType": "Pipeline",
+    "ItemName": "IngestPipeline",
+    "RuleType": "Parameter",
+    "Development": {
+        "SourcePath": "/dev/raw/",
+        "TargetPath": "/dev/processed/"
+    },
+    "Production": {
+        "SourcePath": "/prod/raw/",
+        "TargetPath": "/prod/processed/"
+    }
+}</code></pre>
+
+                <h4>Deployment Pipeline Features:</h4>
+                <div class="key-points">
+                    <h5>1. Comparison View:</h5>
+                    <ul>
+                        <li>Visual diff showing changes between stages</li>
+                        <li>Highlights new, modified, and deleted items</li>
+                        <li>Shows deployment history and timestamps</li>
+                        <li>Identifies items that need deployment</li>
+                    </ul>
+
+                    <h5>2. Selective Deployment:</h5>
+                    <ul>
+                        <li>Deploy individual items or groups</li>
+                        <li>Deploy dependencies automatically</li>
+                        <li>Skip items that haven't changed</li>
+                        <li>Deploy related items together (e.g., report + semantic model)</li>
+                    </ul>
+
+                    <h5>3. Deployment History:</h5>
+                    <ul>
+                        <li>Track who deployed what and when</li>
+                        <li>View deployment status (success, failed, in progress)</li>
+                        <li>Audit trail for compliance</li>
+                        <li>Rollback capability to previous versions</li>
+                    </ul>
+
+                    <h5>4. Automation and APIs:</h5>
+                    <ul>
+                        <li>REST APIs for programmatic deployment</li>
+                        <li>Integration with Azure DevOps pipelines</li>
+                        <li>GitHub Actions integration</li>
+                        <li>Scheduled deployments</li>
+                    </ul>
+                </div>
+
+                <h4>Deployment Pipeline Best Practices:</h4>
+                <ul>
+                    <li><strong>Naming Convention:</strong> Use consistent naming (e.g., Dev_ProjectName, Test_ProjectName, Prod_ProjectName)</li>
+                    <li><strong>Separate Capacities:</strong> Use different capacities for Dev/Test vs. Production</li>
+                    <li><strong>Deployment Rules:</strong> Configure rules for all environment-specific settings</li>
+                    <li><strong>Testing:</strong> Always deploy to Test before Production</li>
+                    <li><strong>Validation:</strong> Test thoroughly in Test environment before promoting</li>
+                    <li><strong>Rollback Plan:</strong> Know how to rollback if deployment fails</li>
+                    <li><strong>Documentation:</strong> Document deployment process and rules</li>
+                    <li><strong>Access Control:</strong> Limit who can deploy to Production</li>
+                    <li><strong>Change Management:</strong> Require approvals for Production deployments</li>
+                    <li><strong>Monitoring:</strong> Monitor deployments and set up alerts for failures</li>
+                </ul>
+
+                <h4>Deployment Pipeline vs. Git Integration:</h4>
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Git Integration</th>
+                        <th>Deployment Pipelines</th>
+                    </tr>
+                    <tr>
+                        <td>Purpose</td>
+                        <td>Version control, collaboration</td>
+                        <td>Environment promotion (Dev→Test→Prod)</td>
+                    </tr>
+                    <tr>
+                        <td>Supported Items</td>
+                        <td>Notebooks, pipelines, dataflows, Spark jobs</td>
+                        <td>All Fabric items including reports, models</td>
+                    </tr>
+                    <tr>
+                        <td>Branching</td>
+                        <td>Yes - feature branches, GitFlow</td>
+                        <td>No - linear promotion</td>
+                    </tr>
+                    <tr>
+                        <td>Code Review</td>
+                        <td>Yes - pull requests</td>
+                        <td>No - manual review</td>
+                    </tr>
+                    <tr>
+                        <td>Parameterization</td>
+                        <td>No - same values across branches</td>
+                        <td>Yes - deployment rules per stage</td>
+                    </tr>
+                    <tr>
+                        <td>Best Used For</td>
+                        <td>Code versioning, team collaboration</td>
+                        <td>Environment management, releases</td>
+                    </tr>
+                </table>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand that deployment pipelines and Git integration serve different purposes and should be used together. Git for version control and collaboration, deployment pipelines for environment promotion. Know which items are supported by each. Understand deployment rules and when to use them. Know that deployment pipelines deploy metadata/code, not data.
+                </div>
+
+                <div class="note">
+                    <strong>Note:</strong> Deployment pipelines deploy the structure and configuration of items, NOT the data. For example, deploying a lakehouse deploys the table schemas, but not the actual data in the tables. Data migration must be handled separately through pipelines or other ETL processes.
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="content-section">
+            <h2>Configure Security and Governance</h2>
+
+            <div class="subsection">
+                <h3>Implement Workspace-Level Access Controls</h3>
+                <p>Workspace roles determine what users can do within a workspace.</p>
+
+                <h4>Workspace Roles:</h4>
+                <table>
+                    <tr>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Admin</td>
+                        <td>Full control, manage users, delete workspace</td>
+                        <td>Workspace owners</td>
+                    </tr>
+                    <tr>
+                        <td>Member</td>
+                        <td>Create, edit, delete items, publish content</td>
+                        <td>Developers and data engineers</td>
+                    </tr>
+                    <tr>
+                        <td>Contributor</td>
+                        <td>Create and edit items, cannot publish</td>
+                        <td>Content creators</td>
+                    </tr>
+                    <tr>
+                        <td>Viewer</td>
+                        <td>Read-only access to content</td>
+                        <td>Business users</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Security Principle:</strong> Follow the principle of least privilege - grant users only the permissions they need.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Item-Level Access Controls</h3>
+                <p>Control access to specific items within a workspace.</p>
+
+                <ul>
+                    <li><strong>Share Items:</strong> Grant access to specific users or groups</li>
+                    <li><strong>Permission Levels:</strong> Read, Write, or Reshare permissions</li>
+                    <li><strong>Link Sharing:</strong> Create shareable links with expiration</li>
+                    <li><strong>Manage Permissions:</strong> View and modify who has access</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Row-Level, Column-Level, Object-Level, and Folder/File-Level Access Controls</h3>
+
+                <h4>Row-Level Security (RLS):</h4>
+                <ul>
+                    <li>Filter data based on user identity</li>
+                    <li>Define security roles with DAX filters</li>
+                    <li>Apply to semantic models and Power BI reports</li>
+                    <li>Test with different user contexts</li>
+                </ul>
+
+                <h4>Column-Level Security:</h4>
+                <ul>
+                    <li>Restrict access to specific columns</li>
+                    <li>Implemented in data warehouses and semantic models</li>
+                    <li>Hide sensitive columns from unauthorized users</li>
+                </ul>
+
+                <h4>Object-Level Security (OLS):</h4>
+                <ul>
+                    <li>Control access to tables, columns, and measures</li>
+                    <li>Hide entire objects from specific users</li>
+                    <li>Configured in semantic models</li>
+                </ul>
+
+                <h4>Folder/File-Level Access:</h4>
+                <ul>
+                    <li>OneLake folder and file permissions</li>
+                    <li>Azure RBAC integration</li>
+                    <li>ACLs (Access Control Lists) for fine-grained control</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand when to use each type of security control and how they work together to provide defense in depth.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Dynamic Data Masking</h3>
+                <p>Dynamic data masking helps prevent unauthorized access to sensitive data by masking it to non-privileged users.</p>
+
+                <h4>Masking Functions:</h4>
+                <table>
+                    <tr>
+                        <th>Function</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Default</td>
+                        <td>Full masking based on data type</td>
+                        <td>XXXX for strings, 0 for numbers</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>Masks email addresses</td>
+                        <td>aXXX@XXXX.com</td>
+                    </tr>
+                    <tr>
+                        <td>Random</td>
+                        <td>Random number within a range</td>
+                        <td>Random value for numeric fields</td>
+                    </tr>
+                    <tr>
+                        <td>Custom String</td>
+                        <td>Custom masking pattern</td>
+                        <td>XXX-XX-1234 for SSN</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Note:</strong> Dynamic data masking is applied at query time and doesn't change the actual data in storage.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Apply Sensitivity Labels to Items</h3>
+                <p>Sensitivity labels classify and protect organizational data based on sensitivity.</p>
+
+                <h4>Label Types:</h4>
+                <ul>
+                    <li><strong>Public:</strong> No restrictions</li>
+                    <li><strong>General:</strong> Internal use only</li>
+                    <li><strong>Confidential:</strong> Restricted access</li>
+                    <li><strong>Highly Confidential:</strong> Strictest controls</li>
+                </ul>
+
+                <h4>Label Capabilities:</h4>
+                <ul>
+                    <li>Encryption of data at rest and in transit</li>
+                    <li>Visual markings (headers, footers, watermarks)</li>
+                    <li>Access restrictions and permissions</li>
+                    <li>Automatic labeling based on content</li>
+                    <li>Label inheritance across items</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Endorse Items</h3>
+                <p>Endorsement helps users identify trusted, high-quality content.</p>
+
+                <h4>Endorsement Types:</h4>
+                <ul>
+                    <li><strong>Promoted:</strong> Recommended by content owner</li>
+                    <li><strong>Certified:</strong> Validated by designated reviewers, meets quality standards</li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Benefits of Endorsement:</h4>
+                    <ul>
+                        <li>Helps users find trusted content</li>
+                        <li>Reduces duplicate content creation</li>
+                        <li>Improves data governance</li>
+                        <li>Increases confidence in data quality</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement and Use Workspace Logging</h3>
+                <p>Workspace logging tracks activities and helps with auditing and troubleshooting.</p>
+
+                <h4>Logging Capabilities:</h4>
+                <ul>
+                    <li><strong>Activity Logs:</strong> Track user actions and system events</li>
+                    <li><strong>Audit Logs:</strong> Compliance and security auditing</li>
+                    <li><strong>Performance Logs:</strong> Monitor query and job performance</li>
+                    <li><strong>Error Logs:</strong> Capture failures and exceptions</li>
+                </ul>
+
+                <h4>Log Destinations:</h4>
+                <ul>
+                    <li>Azure Log Analytics</li>
+                    <li>Azure Storage Account</li>
+                    <li>Event Hub for streaming</li>
+                    <li>Microsoft Purview for governance</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Configure and Implement OneLake Security</h3>
+                <p>OneLake security ensures data is protected at the storage layer.</p>
+
+                <h4>Security Features:</h4>
+                <ul>
+                    <li><strong>Encryption:</strong> Data encrypted at rest and in transit</li>
+                    <li><strong>Access Control:</strong> Azure RBAC and ACLs</li>
+                    <li><strong>Network Security:</strong> Private endpoints and firewall rules</li>
+                    <li><strong>Auditing:</strong> Track all data access</li>
+                    <li><strong>Compliance:</strong> Meet regulatory requirements</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Security Best Practice:</strong> Implement multiple layers of security (workspace, item, row/column, and storage level) for comprehensive protection.
+                </div>
+            </div>
+        </section>
+
+        <section id="orchestration" class="content-section">
+            <h2>Orchestrate Processes</h2>
+
+            <div class="subsection">
+                <h3>Choose Between Dataflow Gen 2, a Pipeline, and a Notebook</h3>
+                <p>Understanding when to use each tool is critical for effective data engineering.</p>
+
+                <table>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Best For</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Dataflow Gen2</strong></td>
+                        <td>Low-code data transformation</td>
+                        <td>
+                            • Power Query (M) transformations<br>
+                            • Visual interface<br>
+                            • Incremental refresh<br>
+                            • Data preparation for business users
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pipeline</strong></td>
+                        <td>Orchestration and workflow</td>
+                        <td>
+                            • Coordinate multiple activities<br>
+                            • Copy data between sources<br>
+                            • Schedule and trigger execution<br>
+                            • Error handling and retry logic
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Notebook</strong></td>
+                        <td>Complex transformations and ML</td>
+                        <td>
+                            • PySpark and SQL code<br>
+                            • Advanced analytics<br>
+                            • Machine learning<br>
+                            • Custom logic and algorithms
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="key-points">
+                    <h4>Decision Criteria:</h4>
+                    <ul>
+                        <li><strong>Use Dataflow Gen2</strong> for simple ETL with visual interface</li>
+                        <li><strong>Use Pipeline</strong> for orchestrating multiple steps and activities</li>
+                        <li><strong>Use Notebook</strong> for complex transformations requiring code</li>
+                        <li><strong>Combine them:</strong> Use pipelines to orchestrate dataflows and notebooks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Design and Implement Schedules and Event-Based Triggers</h3>
+
+                <h4>Schedule Triggers:</h4>
+                <ul>
+                    <li><strong>Time-based:</strong> Run at specific times (hourly, daily, weekly)</li>
+                    <li><strong>Cron expressions:</strong> Complex scheduling patterns</li>
+                    <li><strong>Recurrence:</strong> Repeat at regular intervals</li>
+                    <li><strong>Time zones:</strong> Configure for different time zones</li>
+                </ul>
+
+                <h4>Event-Based Triggers:</h4>
+                <ul>
+                    <li><strong>On-demand:</strong> Manual execution</li>
+                    <li><strong>File arrival:</strong> Trigger when new files arrive</li>
+                    <li><strong>Data refresh:</strong> Trigger after semantic model refresh</li>
+                    <li><strong>Custom events:</strong> Trigger from external systems</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Best Practice:</strong> Use event-based triggers for real-time scenarios and scheduled triggers for batch processing.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Orchestration Patterns with Notebooks and Pipelines</h3>
+
+                <h4>Common Patterns:</h4>
+
+                <h5>1. Sequential Execution:</h5>
+                <ul>
+                    <li>Execute activities one after another</li>
+                    <li>Each step depends on the previous one</li>
+                    <li>Use for linear workflows</li>
+                </ul>
+
+                <h5>2. Parallel Execution:</h5>
+                <ul>
+                    <li>Run multiple activities simultaneously</li>
+                    <li>Improve performance for independent tasks</li>
+                    <li>Use ForEach activity for iteration</li>
+                </ul>
+
+                <h5>3. Conditional Execution:</h5>
+                <ul>
+                    <li>If-Else logic based on conditions</li>
+                    <li>Switch activity for multiple branches</li>
+                    <li>Execute different paths based on data or status</li>
+                </ul>
+
+                <h5>4. Error Handling:</h5>
+                <ul>
+                    <li>Try-Catch patterns</li>
+                    <li>Retry policies for transient failures</li>
+                    <li>Failure notifications and alerts</li>
+                </ul>
+
+                <h4>Parameters and Dynamic Expressions:</h4>
+                <ul>
+                    <li><strong>Pipeline Parameters:</strong> Pass values at runtime</li>
+                    <li><strong>Variables:</strong> Store and manipulate values during execution</li>
+                    <li><strong>Dynamic Content:</strong> Use expressions to build dynamic values</li>
+                    <li><strong>System Variables:</strong> Access pipeline run ID, trigger time, etc.</li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Expression Examples:</h4>
+                    <ul>
+                        <li><code>@pipeline().parameters.parameterName</code> - Access parameter</li>
+                        <li><code>@variables('variableName')</code> - Access variable</li>
+                        <li><code>@utcnow()</code> - Current UTC time</li>
+                        <li><code>@concat('string1', 'string2')</code> - Concatenate strings</li>
+                        <li><code>@formatDateTime(utcnow(), 'yyyy-MM-dd')</code> - Format dates</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DP-700 Study Guide | Last Updated: January 2026</p>
+            <p>This is an unofficial study guide. For official information, visit <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700" target="_blank">Microsoft Learn</a></p>
+        </div>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Reference - DP-700 Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Quick Reference Guide</h1>
+            <p class="subtitle">Cheat Sheets, Comparison Tables, and Quick Lookups</p>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="implement-manage.html">Implement & Manage</a></li>
+                <li><a href="ingest-transform.html">Ingest & Transform</a></li>
+                <li><a href="monitor-optimize.html">Monitor & Optimize</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="quick-reference.html" class="active">Quick Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="content-section">
+            <h2>Fabric Item Types - Complete Comparison</h2>
+
+            <div class="note" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0;">
+                <strong>🍽️ Restaurant Kitchen Analogy:</strong> Think of Fabric items like different stations in a restaurant kitchen. <strong>Lakehouse</strong> is the walk-in cooler - stores everything (raw ingredients/data) and you can cook (process) with various tools. <strong>Data Warehouse</strong> is the prep station - organized, structured, ready for service (BI reports). <strong>KQL Database</strong> is the expeditor station - handles orders coming in fast (streaming data). <strong>Notebooks</strong> are the chef's recipes - instructions for preparing dishes. <strong>Pipelines</strong> are the kitchen manager - orchestrates when each station works and in what order.
+            </div>
+
+            <table>
+                <tr>
+                    <th>Item Type</th>
+                    <th>Primary Use Case</th>
+                    <th>Storage Format</th>
+                    <th>Query Language</th>
+                    <th>Git Support</th>
+                    <th>Deployment Pipeline</th>
+                </tr>
+                <tr>
+                    <td><strong>Lakehouse</strong></td>
+                    <td>Big data analytics, data lake</td>
+                    <td>Delta Lake (Parquet)</td>
+                    <td>SQL, PySpark, Spark SQL</td>
+                    <td>⚠️ Metadata only</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Warehouse</strong></td>
+                    <td>Enterprise DW, BI reporting</td>
+                    <td>Proprietary (SQL)</td>
+                    <td>T-SQL</td>
+                    <td>⚠️ Metadata only</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>KQL Database</strong></td>
+                    <td>Real-time analytics, logs</td>
+                    <td>Columnar (optimized)</td>
+                    <td>KQL (Kusto Query Language)</td>
+                    <td>❌ No</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Notebook</strong></td>
+                    <td>Data exploration, ETL</td>
+                    <td>N/A (code)</td>
+                    <td>PySpark, Scala, R, SQL</td>
+                    <td>✅ Yes</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Pipeline</strong></td>
+                    <td>Orchestration, data movement</td>
+                    <td>N/A (workflow)</td>
+                    <td>JSON (definition)</td>
+                    <td>✅ Yes</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Dataflow Gen2</strong></td>
+                    <td>Low-code ETL, Power Query</td>
+                    <td>N/A (transformation)</td>
+                    <td>M (Power Query)</td>
+                    <td>✅ Yes</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Eventstream</strong></td>
+                    <td>Real-time data ingestion</td>
+                    <td>N/A (streaming)</td>
+                    <td>No-code/Low-code</td>
+                    <td>❌ No</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Semantic Model</strong></td>
+                    <td>BI data model, Power BI</td>
+                    <td>Tabular (VertiPaq)</td>
+                    <td>DAX</td>
+                    <td>❌ No</td>
+                    <td>✅ Yes</td>
+                </tr>
+                <tr>
+                    <td><strong>Report</strong></td>
+                    <td>Data visualization, dashboards</td>
+                    <td>N/A (visuals)</td>
+                    <td>DAX (measures)</td>
+                    <td>❌ No</td>
+                    <td>✅ Yes</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="content-section">
+            <h2>When to Use Which Tool - Decision Matrix</h2>
+            
+            <div class="subsection">
+                <h3>Data Storage: Lakehouse vs. Warehouse vs. KQL Database</h3>
+                <table>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Recommended Choice</th>
+                        <th>Reason</th>
+                    </tr>
+                    <tr>
+                        <td>Large-scale data lake with files and tables</td>
+                        <td><strong>Lakehouse</strong></td>
+                        <td>Supports both structured and unstructured data, Delta Lake format</td>
+                    </tr>
+                    <tr>
+                        <td>Traditional enterprise data warehouse</td>
+                        <td><strong>Data Warehouse</strong></td>
+                        <td>Full T-SQL support, optimized for BI queries, familiar to SQL users</td>
+                    </tr>
+                    <tr>
+                        <td>Real-time log analytics and telemetry</td>
+                        <td><strong>KQL Database</strong></td>
+                        <td>Optimized for time-series data, fast ingestion, powerful KQL queries</td>
+                    </tr>
+                    <tr>
+                        <td>Need both Spark and SQL access</td>
+                        <td><strong>Lakehouse</strong></td>
+                        <td>SQL endpoint + Spark support in one item</td>
+                    </tr>
+                    <tr>
+                        <td>Complex stored procedures and T-SQL logic</td>
+                        <td><strong>Data Warehouse</strong></td>
+                        <td>Full T-SQL feature set including procedures, functions, views</td>
+                    </tr>
+                    <tr>
+                        <td>IoT sensor data, clickstream analytics</td>
+                        <td><strong>KQL Database</strong></td>
+                        <td>High-speed ingestion, time-based queries, windowing functions</td>
+                    </tr>
+                    <tr>
+                        <td>Machine learning feature engineering</td>
+                        <td><strong>Lakehouse</strong></td>
+                        <td>Spark ML libraries, notebook integration, Delta Lake versioning</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="subsection">
+                <h3>Data Transformation: Dataflow Gen2 vs. Notebook vs. Pipeline</h3>
+                <table>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Recommended Choice</th>
+                        <th>Reason</th>
+                    </tr>
+                    <tr>
+                        <td>Business analysts need to transform data</td>
+                        <td><strong>Dataflow Gen2</strong></td>
+                        <td>Low-code Power Query interface, no coding required</td>
+                    </tr>
+                    <tr>
+                        <td>Complex transformations on large datasets</td>
+                        <td><strong>Notebook (PySpark)</strong></td>
+                        <td>Distributed processing, full programming flexibility</td>
+                    </tr>
+                    <tr>
+                        <td>Simple data movement (copy)</td>
+                        <td><strong>Pipeline (Copy activity)</strong></td>
+                        <td>Optimized for data movement, no transformation needed</td>
+                    </tr>
+                    <tr>
+                        <td>Orchestrating multiple steps</td>
+                        <td><strong>Pipeline</strong></td>
+                        <td>Workflow orchestration, dependencies, error handling</td>
+                    </tr>
+                    <tr>
+                        <td>Interactive data exploration</td>
+                        <td><strong>Notebook</strong></td>
+                        <td>Interactive execution, visualizations, iterative development</td>
+                    </tr>
+                    <tr>
+                        <td>Incremental refresh from SQL sources</td>
+                        <td><strong>Dataflow Gen2</strong></td>
+                        <td>Built-in incremental refresh, Power Query connectors</td>
+                    </tr>
+                    <tr>
+                        <td>Machine learning pipelines</td>
+                        <td><strong>Notebook</strong></td>
+                        <td>ML libraries (scikit-learn, MLlib), model training</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Spark Configuration Cheat Sheet</h2>
+            
+            <table>
+                <tr>
+                    <th>Setting</th>
+                    <th>What It Does</th>
+                    <th>When to Increase</th>
+                    <th>When to Decrease</th>
+                </tr>
+                <tr>
+                    <td>spark.executor.memory</td>
+                    <td>Memory per executor</td>
+                    <td>Large datasets, memory-intensive operations</td>
+                    <td>Cost optimization, small datasets</td>
+                </tr>
+                <tr>
+                    <td>spark.executor.cores</td>
+                    <td>CPU cores per executor</td>
+                    <td>CPU-intensive transformations</td>
+                    <td>Memory-bound operations</td>
+                </tr>
+                <tr>
+                    <td>spark.dynamicAllocation.maxExecutors</td>
+                    <td>Maximum number of executors</td>
+                    <td>Large parallel workloads, high concurrency</td>
+                    <td>Cost control, capacity limits</td>
+                </tr>
+                <tr>
+                    <td>spark.sql.shuffle.partitions</td>
+                    <td>Partitions for shuffle operations</td>
+                    <td>Large datasets (>1TB), many executors</td>
+                    <td>Small datasets (<100GB), fewer executors</td>
+                </tr>
+                <tr>
+                    <td>spark.sql.autoBroadcastJoinThreshold</td>
+                    <td>Size limit for broadcast joins</td>
+                    <td>More memory available, small dimension tables</td>
+                    <td>Memory pressure, large dimension tables</td>
+                </tr>
+            </table>
+
+            <h3>Quick Spark Optimization Commands</h3>
+            <pre><code># Check current Spark configuration
+spark.conf.get("spark.executor.memory")
+spark.conf.get("spark.sql.shuffle.partitions")
+
+# Set configuration for current session
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.shuffle.partitions", "400")
+
+# Optimize Delta table with V-Order
+spark.sql("OPTIMIZE tableName VORDER")
+
+# Optimize with Z-Order on specific columns
+spark.sql("OPTIMIZE tableName ZORDER BY (column1, column2)")
+
+# Compact small files
+spark.sql("OPTIMIZE tableName")
+
+# Clean up old versions (7 days retention)
+spark.sql("VACUUM tableName RETAIN 168 HOURS")
+
+# Check table history
+spark.sql("DESCRIBE HISTORY tableName").show()
+
+# Time travel query
+df = spark.read.format("delta").option("versionAsOf", 5).load("path/to/table")</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h2>Security Quick Reference</h2>
+
+            <div class="subsection">
+                <h3>Workspace Roles Comparison</h3>
+                <table>
+                    <tr>
+                        <th>Role</th>
+                        <th>View Items</th>
+                        <th>Create Items</th>
+                        <th>Edit Items</th>
+                        <th>Delete Items</th>
+                        <th>Share Items</th>
+                        <th>Manage Workspace</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Admin</strong></td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Member</strong></td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contributor</strong></td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Viewer</strong></td>
+                        <td>✅</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                        <td>❌</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="subsection">
+                <h3>Row-Level Security (RLS) Quick Guide</h3>
+                <pre><code>-- Create RLS role in semantic model
+CREATE ROLE SalesRegion
+
+-- Define filter expression
+[Region] = USERPRINCIPALNAME()
+
+-- Or use lookup table
+[Region] IN (
+    CALCULATETABLE(
+        VALUES(UserRegions[Region]),
+        UserRegions[Email] = USERPRINCIPALNAME()
+    )
+)
+
+-- Assign users to role
+-- Done in Power BI Service or Fabric portal
+
+-- Test RLS
+-- Use "View as" feature in Power BI Desktop</code></pre>
+
+                <h3>Object-Level Security (OLS) Quick Guide</h3>
+                <pre><code>-- Hide specific columns from users
+-- In semantic model, set column visibility
+
+-- Example: Hide SalaryAmount column from non-managers
+CREATE ROLE Employee
+-- In role settings, deny access to SalaryAmount column
+
+-- Managers role has access to all columns
+CREATE ROLE Manager</code></pre>
+
+                <h3>Dynamic Data Masking Quick Guide</h3>
+                <pre><code>-- Apply masking in Data Warehouse
+ALTER TABLE Customers
+ALTER COLUMN Email ADD MASKED WITH (FUNCTION = 'email()')
+
+ALTER TABLE Customers
+ALTER COLUMN Phone ADD MASKED WITH (FUNCTION = 'partial(1,"XXX-XXX-",4)')
+
+ALTER TABLE Customers
+ALTER COLUMN CreditCard ADD MASKED WITH (FUNCTION = 'default()')
+
+-- Grant unmask permission
+GRANT UNMASK TO ManagerRole
+
+-- Revoke unmask permission
+REVOKE UNMASK FROM EmployeeRole</code></pre>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Data Loading Patterns Cheat Sheet</h2>
+
+            <table>
+                <tr>
+                    <th>Pattern</th>
+                    <th>When to Use</th>
+                    <th>Implementation</th>
+                    <th>Pros</th>
+                    <th>Cons</th>
+                </tr>
+                <tr>
+                    <td><strong>Full Load</strong></td>
+                    <td>Small tables, complete refresh needed</td>
+                    <td>Truncate and load all data</td>
+                    <td>Simple, ensures consistency</td>
+                    <td>Slow for large tables, high resource usage</td>
+                </tr>
+                <tr>
+                    <td><strong>Incremental Load (Watermark)</strong></td>
+                    <td>Tables with timestamp column</td>
+                    <td>Load WHERE modified_date > last_watermark</td>
+                    <td>Fast, efficient, low resource usage</td>
+                    <td>Requires timestamp column, doesn't handle deletes</td>
+                </tr>
+                <tr>
+                    <td><strong>Change Data Capture (CDC)</strong></td>
+                    <td>Need to track inserts, updates, deletes</td>
+                    <td>Use CDC from source database</td>
+                    <td>Captures all changes, handles deletes</td>
+                    <td>Complex setup, source system dependency</td>
+                </tr>
+                <tr>
+                    <td><strong>Delta/Diff Load</strong></td>
+                    <td>Source provides delta files</td>
+                    <td>Load only changed records from delta files</td>
+                    <td>Efficient, source-controlled</td>
+                    <td>Depends on source providing deltas</td>
+                </tr>
+                <tr>
+                    <td><strong>Upsert (Merge)</strong></td>
+                    <td>Need to insert new and update existing</td>
+                    <td>MERGE statement or Delta MERGE</td>
+                    <td>Handles both inserts and updates</td>
+                    <td>Slower than append-only</td>
+                </tr>
+                <tr>
+                    <td><strong>Append-Only</strong></td>
+                    <td>Immutable data, event logs</td>
+                    <td>Simply append new records</td>
+                    <td>Fastest, simplest</td>
+                    <td>Can't update or delete existing records</td>
+                </tr>
+            </table>
+
+            <h3>Incremental Load Code Examples</h3>
+            <pre><code># Method 1: Watermark-based incremental load (PySpark)
+# Get last watermark
+last_watermark = spark.sql("SELECT MAX(modified_date) FROM target_table").collect()[0][0]
+
+# Load incremental data
+incremental_df = spark.read.jdbc(
+    url=jdbc_url,
+    table="source_table",
+    properties={"user": user, "password": password},
+    predicates=[f"modified_date > '{last_watermark}'"]
+)
+
+# Append to target
+incremental_df.write.format("delta").mode("append").saveAsTable("target_table")
+
+# Method 2: Delta MERGE for upsert
+from delta.tables import DeltaTable
+
+target = DeltaTable.forName(spark, "target_table")
+source = spark.read.format("delta").load("/path/to/source")
+
+target.alias("t").merge(
+    source.alias("s"),
+    "t.id = s.id"
+).whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
+
+# Method 3: T-SQL MERGE in Data Warehouse
+MERGE INTO target_table AS target
+USING source_table AS source
+ON target.id = source.id
+WHEN MATCHED THEN
+    UPDATE SET target.value = source.value, target.modified_date = source.modified_date
+WHEN NOT MATCHED THEN
+    INSERT (id, value, modified_date) VALUES (source.id, source.value, source.modified_date);</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h2>Slowly Changing Dimensions (SCD) Quick Reference</h2>
+
+            <table>
+                <tr>
+                    <th>SCD Type</th>
+                    <th>Description</th>
+                    <th>Use Case</th>
+                    <th>Implementation</th>
+                </tr>
+                <tr>
+                    <td><strong>Type 0</strong></td>
+                    <td>No changes allowed</td>
+                    <td>Fixed reference data (country codes)</td>
+                    <td>Reject updates, keep original values</td>
+                </tr>
+                <tr>
+                    <td><strong>Type 1</strong></td>
+                    <td>Overwrite old values</td>
+                    <td>Corrections, no history needed</td>
+                    <td>Simple UPDATE statement</td>
+                </tr>
+                <tr>
+                    <td><strong>Type 2</strong></td>
+                    <td>Add new row, keep history</td>
+                    <td>Track historical changes (customer address)</td>
+                    <td>Add new row with effective dates, expire old row</td>
+                </tr>
+                <tr>
+                    <td><strong>Type 3</strong></td>
+                    <td>Add new column for previous value</td>
+                    <td>Limited history (current + previous)</td>
+                    <td>Add columns like previous_value, previous_date</td>
+                </tr>
+            </table>
+
+            <h3>SCD Type 2 Implementation Example</h3>
+            <pre><code># PySpark SCD Type 2 implementation
+from pyspark.sql.functions import col, current_timestamp, lit
+
+# Source data (new/updated records)
+source_df = spark.read.format("delta").load("/path/to/source")
+
+# Target dimension table
+target_df = spark.read.format("delta").load("/path/to/dim_customer")
+
+# Identify changed records
+changed_records = source_df.join(
+    target_df.filter(col("is_current") == True),
+    "customer_id",
+    "inner"
+).filter(
+    (col("source.address") != col("target.address")) |
+    (col("source.phone") != col("target.phone"))
+)
+
+# Expire old records
+from delta.tables import DeltaTable
+dim_table = DeltaTable.forPath(spark, "/path/to/dim_customer")
+
+dim_table.alias("target").merge(
+    changed_records.alias("source"),
+    "target.customer_id = source.customer_id AND target.is_current = true"
+).whenMatchedUpdate(set={
+    "is_current": lit(False),
+    "end_date": current_timestamp(),
+    "updated_by": lit("ETL_Process")
+}).execute()
+
+# Insert new records
+new_records = source_df.withColumn("is_current", lit(True)) \
+    .withColumn("start_date", current_timestamp()) \
+    .withColumn("end_date", lit(None)) \
+    .withColumn("surrogate_key", monotonically_increasing_id())
+
+new_records.write.format("delta").mode("append").save("/path/to/dim_customer")</code></pre>
+        </section>
+
+        <section class="content-section">
+            <h2>Monitoring and Troubleshooting Quick Commands</h2>
+
+            <div class="subsection">
+                <h3>Pipeline Monitoring</h3>
+                <pre><code># Check pipeline run status
+# Navigate to Monitoring Hub → Pipeline runs
+
+# Filter by status
+Status: Failed, Succeeded, In Progress, Cancelled
+
+# View activity-level details
+Click on pipeline run → View activity runs
+
+# Check error messages
+Activity runs → Error message column
+
+# Re-run failed pipeline
+Select failed run → Re-run</code></pre>
+
+                <h3>Spark Job Monitoring</h3>
+                <pre><code># Access Spark UI from notebook
+# Click "Spark UI" link in notebook toolbar
+
+# Key metrics to check:
+- Jobs: Number of stages, duration
+- Stages: Number of tasks, shuffle read/write
+- Storage: Cached RDDs/DataFrames
+- Executors: Active executors, memory usage
+- SQL: Query execution plans
+
+# Check for issues:
+- Data skew: Uneven task durations in stage
+- Spill: Disk spill indicates memory pressure
+- Shuffle: Large shuffle indicates inefficient joins
+- GC time: High GC time indicates memory issues</code></pre>
+
+                <h3>Query Performance Analysis</h3>
+                <pre><code># Warehouse query performance
+SELECT
+    query_id,
+    start_time,
+    end_time,
+    DATEDIFF(second, start_time, end_time) as duration_seconds,
+    total_rows_returned,
+    query_text
+FROM sys.dm_exec_requests
+WHERE status = 'completed'
+ORDER BY duration_seconds DESC
+
+# Identify slow queries
+# Look for:
+- Missing indexes
+- Table scans on large tables
+- Complex joins
+- Large result sets
+
+# KQL query performance
+.show queries
+| where State == "Completed"
+| project StartedOn, Duration, Text
+| order by Duration desc</code></pre>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Common Exam Scenarios and Solutions</h2>
+
+            <div class="subsection">
+                <h3>Scenario 1: Choose the Right Data Store</h3>
+                <div class="key-points">
+                    <p><strong>Question:</strong> You need to store IoT sensor data (millions of events per minute) and run time-series analytics. What should you use?</p>
+                    <p><strong>Answer:</strong> KQL Database (Eventhouse)</p>
+                    <p><strong>Reason:</strong> Optimized for high-speed ingestion, time-series data, and KQL queries with windowing functions.</p>
+                </div>
+
+                <div class="key-points">
+                    <p><strong>Question:</strong> You need to store both CSV files and structured tables, and query with both Spark and SQL. What should you use?</p>
+                    <p><strong>Answer:</strong> Lakehouse</p>
+                    <p><strong>Reason:</strong> Supports Files folder (unstructured) and Tables folder (structured), with both Spark and SQL endpoint access.</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Scenario 2: Choose the Right Transformation Tool</h3>
+                <div class="key-points">
+                    <p><strong>Question:</strong> Business analysts need to transform data from SQL Server without writing code. What should you use?</p>
+                    <p><strong>Answer:</strong> Dataflow Gen2</p>
+                    <p><strong>Reason:</strong> Low-code Power Query interface, familiar to business users, built-in SQL Server connector.</p>
+                </div>
+
+                <div class="key-points">
+                    <p><strong>Question:</strong> You need to process 10TB of data with complex transformations and machine learning. What should you use?</p>
+                    <p><strong>Answer:</strong> Notebook (PySpark)</p>
+                    <p><strong>Reason:</strong> Distributed processing with Spark, ML libraries, handles large-scale data efficiently.</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Scenario 3: Implement Security</h3>
+                <div class="key-points">
+                    <p><strong>Question:</strong> Sales managers should only see data for their region. How do you implement this?</p>
+                    <p><strong>Answer:</strong> Row-Level Security (RLS) in semantic model</p>
+                    <p><strong>Reason:</strong> RLS filters data based on user identity, perfect for regional/departmental restrictions.</p>
+                </div>
+
+                <div class="key-points">
+                    <p><strong>Question:</strong> Hide salary information from non-HR users in Data Warehouse. What should you use?</p>
+                    <p><strong>Answer:</strong> Dynamic Data Masking</p>
+                    <p><strong>Reason:</strong> Masks sensitive data at query time without changing stored data.</p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Scenario 4: Optimize Performance</h3>
+                <div class="key-points">
+                    <p><strong>Question:</strong> Queries on a large fact table are slow. The table is frequently filtered by date. What should you do?</p>
+                    <p><strong>Answer:</strong> Partition the table by date and use Z-Order on frequently filtered columns</p>
+                    <p><strong>Reason:</strong> Partitioning reduces data scanned, Z-Order co-locates related data for faster queries.</p>
+                </div>
+
+                <div class="key-points">
+                    <p><strong>Question:</strong> Power BI reports are slow when reading from Lakehouse. What can improve performance?</p>
+                    <p><strong>Answer:</strong> Apply V-Order optimization to Delta tables</p>
+                    <p><strong>Reason:</strong> V-Order optimizes Parquet files for Power BI reads, improving query performance significantly.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DP-700 Study Guide | Last Updated: January 2026</p>
+            <p>This is an unofficial study guide. For official information, visit <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700" target="_blank">Microsoft Learn</a></p>
+        </div>
+    </footer>
+</body>
+</html>
+

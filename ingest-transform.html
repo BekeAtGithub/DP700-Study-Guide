@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingest & Transform Data - DP-700 Study Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Ingest and Transform Data</h1>
+            <p class="subtitle">30-35% of Exam Weight</p>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="implement-manage.html">Implement & Manage</a></li>
+                <li><a href="ingest-transform.html" class="active">Ingest & Transform</a></li>
+                <li><a href="monitor-optimize.html">Monitor & Optimize</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="quick-reference.html">Quick Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="loading-patterns" class="content-section">
+            <h2>Design and Implement Loading Patterns</h2>
+            
+            <div class="subsection">
+                <h3>Design and Implement Full and Incremental Data Loads</h3>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>🚚 Moving House Analogy:</strong> <strong>Full load</strong> is like moving to a new house - you pack up EVERYTHING and move it all at once. It's simple but exhausting and time-consuming. <strong>Incremental load</strong> is like only bringing new purchases to your vacation home - you only transport what's new or changed since your last visit. <strong>Watermark</strong> is like keeping a receipt of the last item you brought (timestamp). <strong>CDC (Change Data Capture)</strong> is like having a detailed moving log that tracks every item added, removed, or replaced. Much more efficient for large households (datasets)!
+                </div>
+
+                <h4>Full Load:</h4>
+                <p>Complete refresh of all data from source to destination.</p>
+                
+                <div class="key-points">
+                    <h4>When to Use Full Load:</h4>
+                    <ul>
+                        <li>Small datasets that can be loaded quickly</li>
+                        <li>Source system doesn't track changes</li>
+                        <li>Initial load of data</li>
+                        <li>Data quality issues require complete refresh</li>
+                        <li>Dimension tables with few rows</li>
+                    </ul>
+                </div>
+
+                <h4>Incremental Load:</h4>
+                <p>Load only new or changed data since the last load.</p>
+                
+                <table>
+                    <tr>
+                        <th>Method</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Watermark</td>
+                        <td>Track last modified timestamp</td>
+                        <td>Tables with LastModified column</td>
+                    </tr>
+                    <tr>
+                        <td>Change Data Capture (CDC)</td>
+                        <td>Capture insert, update, delete operations</td>
+                        <td>Databases with CDC enabled</td>
+                    </tr>
+                    <tr>
+                        <td>Delta Detection</td>
+                        <td>Compare source and target to find changes</td>
+                        <td>When source doesn't track changes</td>
+                    </tr>
+                    <tr>
+                        <td>Partition-based</td>
+                        <td>Load data by date/time partitions</td>
+                        <td>Time-series data</td>
+                    </tr>
+                </table>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand the trade-offs between full and incremental loads in terms of performance, complexity, and data freshness.
+                </div>
+
+                <h4>Implementing Incremental Load in Fabric:</h4>
+                <ul>
+                    <li><strong>Dataflow Gen2:</strong> Use incremental refresh settings</li>
+                    <li><strong>Pipelines:</strong> Use Lookup and Copy activities with watermark</li>
+                    <li><strong>Notebooks:</strong> Implement custom logic with PySpark</li>
+                    <li><strong>Delta Lake:</strong> Use MERGE operations for upserts</li>
+                </ul>
+
+                <pre><code>-- Example: Delta Lake MERGE for incremental load
+MERGE INTO target_table AS target
+USING source_table AS source
+ON target.id = source.id
+WHEN MATCHED THEN
+    UPDATE SET *
+WHEN NOT MATCHED THEN
+    INSERT *</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Prepare Data for Loading into a Dimensional Model</h3>
+                <p>Dimensional modeling organizes data into facts and dimensions for analytics.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>📊 Spreadsheet Analogy:</strong> Think of a <strong>dimensional model</strong> like organizing spreadsheets. <strong>Fact tables</strong> are like your main transaction log (sales receipts) - lots of rows with numbers you want to analyze. <strong>Dimension tables</strong> are like lookup tables (customer list, product catalog, calendar) - they provide context for the facts. <strong>SCD Type 2</strong> is like keeping a history sheet where you add a new row every time a customer moves, so you can see where they lived when they made each purchase. The <strong>surrogate key</strong> is like a row number that never changes, even if the customer's name or address does.
+                </div>
+
+                <h4>Dimension Tables:</h4>
+                <ul>
+                    <li><strong>Slowly Changing Dimensions (SCD):</strong>
+                        <ul>
+                            <li><strong>Type 0:</strong> No changes allowed</li>
+                            <li><strong>Type 1:</strong> Overwrite old values (no history)</li>
+                            <li><strong>Type 2:</strong> Add new row with version/date (full history)</li>
+                            <li><strong>Type 3:</strong> Add new column for previous value (limited history)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Surrogate Keys:</strong> Auto-generated unique identifiers</li>
+                    <li><strong>Natural Keys:</strong> Business keys from source systems</li>
+                    <li><strong>Attributes:</strong> Descriptive information</li>
+                </ul>
+
+                <h4>Fact Tables:</h4>
+                <ul>
+                    <li><strong>Measures:</strong> Numeric values to aggregate</li>
+                    <li><strong>Foreign Keys:</strong> References to dimension tables</li>
+                    <li><strong>Grain:</strong> Level of detail (e.g., one row per transaction)</li>
+                    <li><strong>Types:</strong>
+                        <ul>
+                            <li>Transaction facts (one row per event)</li>
+                            <li>Periodic snapshot facts (regular intervals)</li>
+                            <li>Accumulating snapshot facts (lifecycle tracking)</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Data Preparation Steps:</h4>
+                    <ol>
+                        <li>Identify business processes and grain</li>
+                        <li>Identify dimensions and their attributes</li>
+                        <li>Identify facts and measures</li>
+                        <li>Generate surrogate keys for dimensions</li>
+                        <li>Handle slowly changing dimensions</li>
+                        <li>Create fact table with foreign keys</li>
+                        <li>Implement data quality checks</li>
+                    </ol>
+                </div>
+
+                <h4>SCD Type 2 Implementation Example:</h4>
+                <pre><code>-- Add versioning columns to dimension
+ALTER TABLE DimCustomer ADD
+    ValidFrom DATE,
+    ValidTo DATE,
+    IsCurrent BIT
+
+-- Insert new version when customer changes
+INSERT INTO DimCustomer (CustomerKey, Name, Address, ValidFrom, ValidTo, IsCurrent)
+VALUES (NEWID(), 'John Doe', 'New Address', GETDATE(), '9999-12-31', 1)
+
+-- Update old version
+UPDATE DimCustomer
+SET ValidTo = GETDATE(), IsCurrent = 0
+WHERE CustomerID = 123 AND IsCurrent = 1</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Design and Implement a Loading Pattern for Streaming Data</h3>
+                <p>Streaming data requires different patterns than batch processing.</p>
+
+                <div class="note" style="background-color: #e8f4f8; border-left: 4px solid #0078d4; padding: 15px; margin: 15px 0;">
+                    <strong>📺 TV Broadcasting Analogy:</strong> <strong>Batch processing</strong> is like watching a recorded TV show - you wait for the whole episode to be ready, then watch it all at once. <strong>Streaming data</strong> is like watching live TV - data flows continuously and you process it as it arrives. <strong>Micro-batching</strong> is like recording 5-minute segments of a live show and processing each segment. <strong>Windowing</strong> is like analyzing "what happened in the last 10 minutes" of a sports game. <strong>Watermarks</strong> handle late arrivals - like when a delayed broadcast catches up with live TV.
+                </div>
+
+                <h4>Streaming Patterns:</h4>
+                <table>
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Description</th>
+                        <th>Tools</th>
+                    </tr>
+                    <tr>
+                        <td>Micro-batching</td>
+                        <td>Process small batches at regular intervals</td>
+                        <td>Spark Structured Streaming</td>
+                    </tr>
+                    <tr>
+                        <td>Event-driven</td>
+                        <td>Process events as they arrive</td>
+                        <td>Eventstreams, Event Hubs</td>
+                    </tr>
+                    <tr>
+                        <td>Lambda Architecture</td>
+                        <td>Combine batch and streaming layers</td>
+                        <td>Lakehouse + Eventstreams</td>
+                    </tr>
+                    <tr>
+                        <td>Kappa Architecture</td>
+                        <td>Streaming-only processing</td>
+                        <td>Eventstreams + KQL Database</td>
+                    </tr>
+                </table>
+
+                <div class="note">
+                    <strong>Key Consideration:</strong> Choose streaming patterns based on latency requirements, data volume, and processing complexity.
+                </div>
+            </div>
+        </section>
+
+        <section id="batch-data" class="content-section">
+            <h2>Ingest and Transform Batch Data</h2>
+
+            <div class="subsection">
+                <h3>Choose an Appropriate Data Store</h3>
+
+                <table>
+                    <tr>
+                        <th>Data Store</th>
+                        <th>Best For</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Lakehouse</strong></td>
+                        <td>Big data analytics, data science</td>
+                        <td>
+                            • Delta Lake format<br>
+                            • ACID transactions<br>
+                            • Schema evolution<br>
+                            • Time travel
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Warehouse</strong></td>
+                        <td>Structured analytics, BI reporting</td>
+                        <td>
+                            • T-SQL queries<br>
+                            • Optimized for analytics<br>
+                            • Materialized views<br>
+                            • Columnstore indexes
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>KQL Database</strong></td>
+                        <td>Real-time analytics, log data</td>
+                        <td>
+                            • Fast ingestion<br>
+                            • Time-series optimized<br>
+                            • KQL queries<br>
+                            • Streaming support
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>OneLake</strong></td>
+                        <td>Raw data storage, data lake</td>
+                        <td>
+                            • Unified storage<br>
+                            • Shortcuts<br>
+                            • Open formats<br>
+                            • Multi-workspace access
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="key-points">
+                    <h4>Selection Criteria:</h4>
+                    <ul>
+                        <li><strong>Data Structure:</strong> Structured → Warehouse, Semi/Unstructured → Lakehouse</li>
+                        <li><strong>Query Language:</strong> SQL → Warehouse, PySpark/SQL → Lakehouse, KQL → KQL DB</li>
+                        <li><strong>Latency:</strong> Real-time → KQL DB, Batch → Lakehouse/Warehouse</li>
+                        <li><strong>Use Case:</strong> BI → Warehouse, Data Science → Lakehouse, Logs → KQL DB</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Choose Between Dataflows, Notebooks, KQL, and T-SQL for Data Transformation</h3>
+
+                <table>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Language</th>
+                        <th>Best For</th>
+                        <th>Complexity</th>
+                    </tr>
+                    <tr>
+                        <td>Dataflow Gen2</td>
+                        <td>Power Query (M)</td>
+                        <td>Low-code ETL, business users</td>
+                        <td>Low</td>
+                    </tr>
+                    <tr>
+                        <td>Notebooks</td>
+                        <td>PySpark, SQL, R</td>
+                        <td>Complex transformations, ML</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>KQL</td>
+                        <td>Kusto Query Language</td>
+                        <td>Real-time analytics, log analysis</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>T-SQL</td>
+                        <td>Transact-SQL</td>
+                        <td>Warehouse transformations, stored procedures</td>
+                        <td>Medium</td>
+                    </tr>
+                </table>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Know when to use each transformation tool based on user skills, complexity, and performance requirements.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Create and Manage Shortcuts to Data</h3>
+                <p>Shortcuts provide access to data without copying it, enabling data virtualization.</p>
+
+                <h4>Shortcut Types:</h4>
+                <ul>
+                    <li><strong>OneLake Shortcuts:</strong> Link to other OneLake locations</li>
+                    <li><strong>ADLS Gen2 Shortcuts:</strong> Link to Azure Data Lake Storage</li>
+                    <li><strong>S3 Shortcuts:</strong> Link to Amazon S3 buckets</li>
+                    <li><strong>Dataverse Shortcuts:</strong> Link to Microsoft Dataverse</li>
+                </ul>
+
+                <h4>Benefits of Shortcuts:</h4>
+                <ul>
+                    <li>No data duplication</li>
+                    <li>Reduced storage costs</li>
+                    <li>Single source of truth</li>
+                    <li>Real-time access to source data</li>
+                    <li>Simplified data management</li>
+                </ul>
+
+                <h4>Creating Shortcuts:</h4>
+                <ol>
+                    <li>Navigate to Lakehouse or KQL Database</li>
+                    <li>Select "New shortcut"</li>
+                    <li>Choose source type (OneLake, ADLS, S3, etc.)</li>
+                    <li>Provide connection details and credentials</li>
+                    <li>Select folder/container to link</li>
+                    <li>Name the shortcut</li>
+                </ol>
+
+                <div class="note">
+                    <strong>Performance Note:</strong> Shortcuts may have higher latency than local data. Consider copying data for frequently accessed datasets.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Implement Mirroring</h3>
+                <p>Mirroring provides near real-time replication of data from external databases to Fabric.</p>
+
+                <h4>Supported Sources:</h4>
+                <ul>
+                    <li>Azure SQL Database</li>
+                    <li>Azure Cosmos DB</li>
+                    <li>Snowflake</li>
+                    <li>Azure Databricks (coming soon)</li>
+                </ul>
+
+                <h4>Mirroring Features:</h4>
+                <ul>
+                    <li><strong>Continuous Replication:</strong> Near real-time data sync</li>
+                    <li><strong>No ETL Required:</strong> Automatic data movement</li>
+                    <li><strong>Delta Lake Format:</strong> Data stored in OneLake as Delta</li>
+                    <li><strong>Analytics Ready:</strong> Query with SQL, PySpark, or Power BI</li>
+                    <li><strong>Low Impact:</strong> Minimal impact on source system</li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Mirroring vs. Shortcuts:</h4>
+                    <ul>
+                        <li><strong>Mirroring:</strong> Copies data to OneLake, better performance, near real-time</li>
+                        <li><strong>Shortcuts:</strong> Virtual link, no copy, real-time but may be slower</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Ingest Data by Using Pipelines</h3>
+                <p>Data pipelines orchestrate data movement and transformation activities.</p>
+
+                <h4>Key Pipeline Activities:</h4>
+                <ul>
+                    <li><strong>Copy Data:</strong> Move data between sources and destinations</li>
+                    <li><strong>Dataflow:</strong> Execute Dataflow Gen2 transformations</li>
+                    <li><strong>Notebook:</strong> Run Spark notebooks</li>
+                    <li><strong>Stored Procedure:</strong> Execute database procedures</li>
+                    <li><strong>Web Activity:</strong> Call REST APIs</li>
+                    <li><strong>ForEach:</strong> Iterate over collections</li>
+                    <li><strong>If Condition:</strong> Conditional branching</li>
+                    <li><strong>Wait:</strong> Pause execution</li>
+                </ul>
+
+                <h4>Copy Activity Configuration:</h4>
+                <ul>
+                    <li><strong>Source:</strong> Define source connection and query/table</li>
+                    <li><strong>Destination:</strong> Define target location and format</li>
+                    <li><strong>Mapping:</strong> Map source columns to destination</li>
+                    <li><strong>Settings:</strong> Configure parallelism, fault tolerance</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Performance Tip:</strong> Use parallel copy with partitioning for large datasets to improve throughput.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Ingest Data by Using Continuous Integration from OneLake</h3>
+                <p>Continuous integration enables automatic data processing as new files arrive in OneLake.</p>
+
+                <h4>Implementation Approaches:</h4>
+                <ul>
+                    <li><strong>Event-based Triggers:</strong> Trigger pipelines on file arrival</li>
+                    <li><strong>Scheduled Scans:</strong> Periodically check for new files</li>
+                    <li><strong>Incremental Load:</strong> Process only new/modified files</li>
+                    <li><strong>File Patterns:</strong> Filter files by name, extension, or path</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Best Practice:</strong> Use folder structures with date partitions (e.g., /year/month/day/) for efficient incremental processing.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Transform Data by Using Power Query (M), PySpark, SQL, and KQL</h3>
+
+                <h4>Power Query (M) - Dataflow Gen2:</h4>
+                <pre><code>// Example: Filter and transform data
+let
+    Source = Lakehouse.Contents(),
+    FilteredRows = Table.SelectRows(Source, each [Status] = "Active"),
+    AddedColumn = Table.AddColumn(FilteredRows, "FullName",
+        each [FirstName] & " " & [LastName])
+in
+    AddedColumn</code></pre>
+
+                <h4>PySpark - Notebooks:</h4>
+                <pre><code># Example: Read, transform, and write data
+from pyspark.sql.functions import col, concat, lit
+
+df = spark.read.format("delta").load("Tables/customers")
+transformed_df = df.filter(col("status") == "Active") \
+    .withColumn("full_name", concat(col("first_name"), lit(" "), col("last_name")))
+transformed_df.write.format("delta").mode("overwrite").save("Tables/customers_active")</code></pre>
+
+                <h4>SQL - Warehouse/Lakehouse:</h4>
+                <pre><code>-- Example: Create transformed view
+CREATE OR REPLACE VIEW vw_active_customers AS
+SELECT
+    customer_id,
+    CONCAT(first_name, ' ', last_name) AS full_name,
+    email,
+    status
+FROM customers
+WHERE status = 'Active';</code></pre>
+
+                <h4>KQL - KQL Database:</h4>
+                <pre><code>// Example: Query and transform log data
+logs
+| where timestamp > ago(1h)
+| where severity == "Error"
+| summarize count() by bin(timestamp, 5m), application
+| order by timestamp desc</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Denormalize Data</h3>
+                <p>Denormalization combines related tables to improve query performance.</p>
+
+                <h4>Denormalization Techniques:</h4>
+                <ul>
+                    <li><strong>Flattening:</strong> Combine parent-child relationships into single table</li>
+                    <li><strong>Pre-joining:</strong> Join frequently queried tables</li>
+                    <li><strong>Embedding:</strong> Store related data as nested structures (JSON, arrays)</li>
+                    <li><strong>Duplicating:</strong> Repeat data across tables to avoid joins</li>
+                </ul>
+
+                <h4>Example - Denormalize Orders and Customers:</h4>
+                <pre><code>-- Create denormalized table
+CREATE TABLE orders_denormalized AS
+SELECT
+    o.order_id,
+    o.order_date,
+    o.total_amount,
+    c.customer_id,
+    c.customer_name,
+    c.email,
+    c.country
+FROM orders o
+INNER JOIN customers c ON o.customer_id = c.customer_id;</code></pre>
+
+                <div class="key-points">
+                    <h4>When to Denormalize:</h4>
+                    <ul>
+                        <li>Read-heavy workloads (analytics)</li>
+                        <li>Frequent joins impacting performance</li>
+                        <li>Data warehouse/lakehouse scenarios</li>
+                        <li>Reporting and BI use cases</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Group and Aggregate Data</h3>
+                <p>Aggregation summarizes data for analysis and reporting.</p>
+
+                <h4>Common Aggregation Functions:</h4>
+                <table>
+                    <tr>
+                        <th>Function</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>SUM</td>
+                        <td>Total of values</td>
+                        <td>SUM(sales_amount)</td>
+                    </tr>
+                    <tr>
+                        <td>AVG</td>
+                        <td>Average value</td>
+                        <td>AVG(order_value)</td>
+                    </tr>
+                    <tr>
+                        <td>COUNT</td>
+                        <td>Number of rows</td>
+                        <td>COUNT(*)</td>
+                    </tr>
+                    <tr>
+                        <td>MIN/MAX</td>
+                        <td>Minimum/Maximum value</td>
+                        <td>MAX(order_date)</td>
+                    </tr>
+                    <tr>
+                        <td>GROUP BY</td>
+                        <td>Group rows by column(s)</td>
+                        <td>GROUP BY customer_id</td>
+                    </tr>
+                </table>
+
+                <h4>PySpark Aggregation Example:</h4>
+                <pre><code>from pyspark.sql.functions import sum, avg, count, max
+
+# Group and aggregate sales data
+sales_summary = df.groupBy("customer_id", "product_category") \
+    .agg(
+        sum("sales_amount").alias("total_sales"),
+        avg("sales_amount").alias("avg_sales"),
+        count("order_id").alias("order_count"),
+        max("order_date").alias("last_order_date")
+    )</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Handle Duplicate, Missing, and Late-Arriving Data</h3>
+
+                <h4>Handling Duplicates:</h4>
+                <ul>
+                    <li><strong>Deduplication:</strong> Remove duplicate rows based on key columns</li>
+                    <li><strong>ROW_NUMBER():</strong> Rank duplicates and keep first/last</li>
+                    <li><strong>DISTINCT:</strong> Select unique rows</li>
+                    <li><strong>Primary Keys:</strong> Enforce uniqueness at database level</li>
+                </ul>
+
+                <pre><code># PySpark: Remove duplicates
+df_deduplicated = df.dropDuplicates(["customer_id", "order_date"])
+
+# Keep latest record per customer
+from pyspark.sql.window import Window
+from pyspark.sql.functions import row_number, desc
+
+window_spec = Window.partitionBy("customer_id").orderBy(desc("timestamp"))
+df_latest = df.withColumn("row_num", row_number().over(window_spec)) \
+    .filter(col("row_num") == 1) \
+    .drop("row_num")</code></pre>
+
+                <h4>Handling Missing Data:</h4>
+                <ul>
+                    <li><strong>Drop:</strong> Remove rows with missing values</li>
+                    <li><strong>Fill:</strong> Replace with default values (0, "Unknown", etc.)</li>
+                    <li><strong>Impute:</strong> Use statistical methods (mean, median, mode)</li>
+                    <li><strong>Forward/Backward Fill:</strong> Use previous/next value</li>
+                </ul>
+
+                <pre><code># PySpark: Handle missing values
+df_cleaned = df.fillna({
+    "age": 0,
+    "country": "Unknown",
+    "email": "noemail@example.com"
+})
+
+# Drop rows with any null values
+df_no_nulls = df.dropna()</code></pre>
+
+                <h4>Handling Late-Arriving Data:</h4>
+                <ul>
+                    <li><strong>Watermarking:</strong> Define how long to wait for late data</li>
+                    <li><strong>Reprocessing:</strong> Reprocess affected time windows</li>
+                    <li><strong>Versioning:</strong> Maintain multiple versions of aggregates</li>
+                    <li><strong>Append-only:</strong> Add late data without modifying existing records</li>
+                </ul>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand different strategies for handling data quality issues and when to apply each approach.
+                </div>
+            </div>
+        </section>
+
+        <section id="streaming-data" class="content-section">
+            <h2>Ingest and Transform Streaming Data</h2>
+
+            <div class="subsection">
+                <h3>Choose an Appropriate Streaming Engine</h3>
+
+                <table>
+                    <tr>
+                        <th>Engine</th>
+                        <th>Best For</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Eventstreams</strong></td>
+                        <td>Low-code streaming, event routing</td>
+                        <td>
+                            • Visual designer<br>
+                            • Multiple sources/destinations<br>
+                            • Real-time transformations<br>
+                            • No coding required
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Spark Structured Streaming</strong></td>
+                        <td>Complex transformations, ML</td>
+                        <td>
+                            • PySpark/Scala code<br>
+                            • Advanced analytics<br>
+                            • Stateful processing<br>
+                            • Exactly-once semantics
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>KQL Database</strong></td>
+                        <td>Real-time analytics, logs</td>
+                        <td>
+                            • Fast ingestion<br>
+                            • Time-series optimized<br>
+                            • KQL queries<br>
+                            • Built-in streaming
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="key-points">
+                    <h4>Selection Criteria:</h4>
+                    <ul>
+                        <li><strong>Eventstreams:</strong> Simple routing, no-code transformations</li>
+                        <li><strong>Spark Streaming:</strong> Complex logic, stateful operations, ML</li>
+                        <li><strong>KQL Database:</strong> Real-time queries, log analytics, telemetry</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Choose Between Native Storage, Mirrored Storage, or Shortcuts in Real-Time Intelligence</h3>
+
+                <h4>Storage Options:</h4>
+                <ul>
+                    <li><strong>Native Storage (KQL Database):</strong>
+                        <ul>
+                            <li>Best performance for real-time queries</li>
+                            <li>Optimized for time-series data</li>
+                            <li>Automatic indexing and compression</li>
+                            <li>Use for: Logs, telemetry, IoT data</li>
+                        </ul>
+                    </li>
+                    <li><strong>Mirrored Storage:</strong>
+                        <ul>
+                            <li>Replicate data from external sources</li>
+                            <li>Near real-time sync</li>
+                            <li>Stored in OneLake as Delta</li>
+                            <li>Use for: External database replication</li>
+                        </ul>
+                    </li>
+                    <li><strong>Shortcuts:</strong>
+                        <ul>
+                            <li>Virtual link to external data</li>
+                            <li>No data copy</li>
+                            <li>Real-time access</li>
+                            <li>Use for: Accessing data without duplication</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Choose Between Accelerated Shortcuts and Non-Accelerated Shortcuts in Real-Time Intelligence</h3>
+
+                <h4>Accelerated Shortcuts:</h4>
+                <ul>
+                    <li>Data cached in KQL Database for faster queries</li>
+                    <li>Automatic refresh and synchronization</li>
+                    <li>Better performance for frequent queries</li>
+                    <li>Additional storage cost</li>
+                </ul>
+
+                <h4>Non-Accelerated Shortcuts:</h4>
+                <ul>
+                    <li>Direct query to source data</li>
+                    <li>No caching or data copy</li>
+                    <li>Lower cost, higher latency</li>
+                    <li>Good for infrequent access</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Decision Guide:</strong> Use accelerated shortcuts for frequently queried data; use non-accelerated for occasional access or cost optimization.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Process Data by Using Eventstreams</h3>
+                <p>Eventstreams provide a no-code way to ingest, transform, and route streaming data.</p>
+
+                <h4>Eventstream Sources:</h4>
+                <ul>
+                    <li>Azure Event Hubs</li>
+                    <li>Azure IoT Hub</li>
+                    <li>Sample data</li>
+                    <li>Custom app (via Event Hub)</li>
+                </ul>
+
+                <h4>Eventstream Transformations:</h4>
+                <ul>
+                    <li><strong>Filter:</strong> Remove unwanted events</li>
+                    <li><strong>Manage Fields:</strong> Add, remove, or rename fields</li>
+                    <li><strong>Aggregate:</strong> Group and summarize data</li>
+                    <li><strong>Expand:</strong> Flatten nested JSON</li>
+                    <li><strong>Join:</strong> Combine multiple streams</li>
+                </ul>
+
+                <h4>Eventstream Destinations:</h4>
+                <ul>
+                    <li>Lakehouse</li>
+                    <li>KQL Database</li>
+                    <li>Reflex (for alerts and actions)</li>
+                    <li>Custom app</li>
+                </ul>
+
+                <div class="key-points">
+                    <h4>Eventstream Best Practices:</h4>
+                    <ul>
+                        <li>Use for simple streaming scenarios</li>
+                        <li>Combine with Reflex for real-time alerts</li>
+                        <li>Monitor throughput and latency</li>
+                        <li>Use partitioning for scalability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Process Data by Using Spark Structured Streaming</h3>
+                <p>Spark Structured Streaming enables complex stream processing with PySpark.</p>
+
+                <h4>Key Concepts:</h4>
+                <ul>
+                    <li><strong>Streaming DataFrame:</strong> Unbounded table that grows over time</li>
+                    <li><strong>Trigger:</strong> When to process data (continuous, micro-batch)</li>
+                    <li><strong>Watermark:</strong> Handle late-arriving data</li>
+                    <li><strong>Checkpointing:</strong> Fault tolerance and recovery</li>
+                    <li><strong>Output Modes:</strong> Append, Complete, Update</li>
+                </ul>
+
+                <h4>Example - Read from Event Hub and Write to Lakehouse:</h4>
+                <pre><code># Configure Event Hub connection
+connectionString = "Endpoint=sb://..."
+ehConf = {
+    'eventhubs.connectionString': connectionString
+}
+
+# Read streaming data
+df = spark.readStream \
+    .format("eventhubs") \
+    .options(**ehConf) \
+    .load()
+
+# Transform data
+from pyspark.sql.functions import col, from_json, schema_of_json
+
+# Parse JSON body
+parsed_df = df.select(
+    col("body").cast("string").alias("json_data")
+).select(
+    from_json(col("json_data"), schema).alias("data")
+).select("data.*")
+
+# Write to Delta Lake
+query = parsed_df.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "/checkpoints/stream1") \
+    .start("Tables/streaming_data")</code></pre>
+
+                <div class="important">
+                    <strong>Exam Tip:</strong> Understand checkpointing, watermarking, and output modes for Spark Structured Streaming.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Process Data by Using KQL</h3>
+                <p>KQL (Kusto Query Language) is optimized for real-time analytics on streaming data.</p>
+
+                <h4>Common KQL Operations:</h4>
+                <pre><code>// Filter and aggregate streaming data
+StreamingData
+| where timestamp > ago(1h)
+| where severity in ("Error", "Critical")
+| summarize
+    ErrorCount = count(),
+    UniqueUsers = dcount(user_id)
+    by bin(timestamp, 5m), application
+| order by timestamp desc
+
+// Join with reference data
+StreamingEvents
+| join kind=inner (
+    ReferenceData
+    | where isActive == true
+) on $left.device_id == $right.device_id
+| project timestamp, device_id, device_name, event_type, value</code></pre>
+
+                <h4>KQL for Time-Series Analysis:</h4>
+                <pre><code>// Detect anomalies in metrics
+Metrics
+| where timestamp > ago(7d)
+| make-series avg_value=avg(value) on timestamp step 1h
+| extend anomalies=series_decompose_anomalies(avg_value)
+| mv-expand timestamp, avg_value, anomalies
+| where anomalies != 0</code></pre>
+            </div>
+
+            <div class="subsection">
+                <h3>Create Windowing Functions</h3>
+                <p>Windows group streaming data by time intervals for aggregation.</p>
+
+                <h4>Window Types:</h4>
+                <table>
+                    <tr>
+                        <th>Window Type</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Tumbling</td>
+                        <td>Fixed-size, non-overlapping windows</td>
+                        <td>Hourly sales totals</td>
+                    </tr>
+                    <tr>
+                        <td>Sliding</td>
+                        <td>Fixed-size, overlapping windows</td>
+                        <td>Moving averages</td>
+                    </tr>
+                    <tr>
+                        <td>Session</td>
+                        <td>Variable-size based on activity gaps</td>
+                        <td>User sessions</td>
+                    </tr>
+                </table>
+
+                <h4>Spark Structured Streaming Windows:</h4>
+                <pre><code>from pyspark.sql.functions import window, col, avg
+
+# Tumbling window - 10 minute intervals
+tumbling_df = df.groupBy(
+    window(col("timestamp"), "10 minutes")
+).agg(
+    avg("temperature").alias("avg_temp")
+)
+
+# Sliding window - 10 minute window, 5 minute slide
+sliding_df = df.groupBy(
+    window(col("timestamp"), "10 minutes", "5 minutes")
+).agg(
+    avg("temperature").alias("avg_temp")
+)
+
+# With watermark for late data
+windowed_df = df \
+    .withWatermark("timestamp", "10 minutes") \
+    .groupBy(
+        window(col("timestamp"), "10 minutes")
+    ).agg(
+        avg("temperature").alias("avg_temp")
+    )</code></pre>
+
+                <h4>KQL Windows:</h4>
+                <pre><code>// Tumbling window with bin()
+Events
+| summarize count() by bin(timestamp, 10m)
+
+// Sliding window with sliding_window_counts()
+Events
+| summarize count() by sliding_window_counts(timestamp, 10m, 5m)</code></pre>
+
+                <div class="key-points">
+                    <h4>Windowing Best Practices:</h4>
+                    <ul>
+                        <li>Use tumbling windows for non-overlapping aggregates</li>
+                        <li>Use sliding windows for moving calculations</li>
+                        <li>Set appropriate watermarks to handle late data</li>
+                        <li>Consider window size vs. latency trade-offs</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DP-700 Study Guide | Last Updated: January 2026</p>
+            <p>This is an unofficial study guide. For official information, visit <a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/dp-700" target="_blank">Microsoft Learn</a></p>
+        </div>
+    </footer>
+</body>
+</html>
+
