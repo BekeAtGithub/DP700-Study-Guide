@@ -369,6 +369,44 @@ footer a:hover {
     text-decoration: underline;
 }
 
+/* Creator Section - Galaxy Theme */
+.creator-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.creator-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(80, 230, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(0, 120, 212, 0.1) 0%, transparent 50%);
+    animation: galaxyPulse 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes galaxyPulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.creator-section a:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(80, 230, 255, 0.8), 0 0 20px rgba(80, 230, 255, 0.4);
+    transform: scale(1.05);
+    display: inline-block;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     header h1 {
