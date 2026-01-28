@@ -443,45 +443,77 @@ body {
         max-width: 100%;
     }
 
-    /* Header adjustments */
+    /* Header adjustments - More compact */
     header {
-        padding: 1.5rem 0;
+        padding: 1rem 0;
     }
 
     header h1 {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         line-height: 1.2;
+        margin-bottom: 0.25rem;
     }
 
     .subtitle {
-        font-size: 1rem;
+        font-size: 0.85rem;
+        margin: 0;
     }
 
-    /* Navigation - Stack vertically with larger touch targets */
+    /* Navigation - Horizontal scroll on mobile (compact) */
     .main-nav {
-        padding: 0.5rem 0;
+        padding: 0;
+        position: sticky;
+        top: 0;
+        background: linear-gradient(90deg, var(--dark-bg) 0%, var(--dark-bg) 90%, transparent 100%);
+    }
+
+    .main-nav::after {
+        content: '→';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1.5rem;
+        padding: 0 0.5rem;
+        pointer-events: none;
+        background: linear-gradient(90deg, transparent 0%, var(--dark-bg) 30%);
+        width: 40px;
+        text-align: right;
     }
 
     .main-nav ul {
-        flex-direction: column;
+        flex-direction: row;
         gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        flex-wrap: nowrap;
+        padding: 0.5rem 0;
+    }
+
+    .main-nav ul::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
     }
 
     .main-nav li {
-        width: 100%;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .main-nav li:last-child {
-        border-bottom: none;
+        border-right: none;
     }
 
     .main-nav a {
         text-align: center;
-        padding: 1rem;
+        padding: 0.75rem 1rem;
         display: block;
-        font-size: 1rem;
-        min-height: 48px; /* iOS recommended touch target */
+        font-size: 0.9rem;
+        white-space: nowrap;
+        min-height: auto;
     }
 
     /* Typography adjustments */
